@@ -19,7 +19,7 @@ const DashboardHeroBanner = () => {
         />
         <div className="flex flex-col ml-4">
           <p className="text-sm">Total Savings</p>
-          <p className="text-base font-bold">Rs 3,00,000</p>
+          <p className="text-base font-bold">Rs 0</p>
         </div>
       </div>
       <div className="flex justify-between gap-4 mt-4">
@@ -30,7 +30,7 @@ const DashboardHeroBanner = () => {
           />
           <div className="flex flex-col ml-4">
             <p className="text-sm">Income</p>
-            <p className="text-base font-bold">Rs 1,56,000</p>
+            <p className="text-base font-bold">Rs 0</p>
           </div>
         </div>
         <div
@@ -43,7 +43,7 @@ const DashboardHeroBanner = () => {
           />
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
-            <p className="text-base font-bold">Rs 25,500</p>
+            <p className="text-base font-bold">Rs 0</p>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ const Modal = ({ title, onClose, children }: ModalProps) => {
         className="flex flex-col w-11/12 border bottom-1 border-black rounded-xl"
         onClick={handleStopPropagation}
       >
-        <div className="flex justify-between items-center p-4 bg-slate-400 rounded-t-xl">
+        <div className="flex justify-between items-center p-4 bg-slate-300 rounded-t-xl">
           <p className="text-xl font-bold">{title}</p>
           <FontAwesomeIcon
             icon={faXmark}

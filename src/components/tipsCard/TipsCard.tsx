@@ -9,7 +9,7 @@ interface TipsCardProps {
 }
 const TipsCard = ({ list }: TipsCardProps) => {
   return (
-    <div className="flex flex-col p-4 py-5 rounded-xl mt-4 bg-slate-300">
+    <div className="flex flex-col p-4 py-5 rounded-xl mt-4 bg-slate-200">
       <div className="flex items-center">
         <FontAwesomeIcon icon={faLightbulb} className="text-xl text-blue-400" />
         <p className="text-xl font-bold ml-2">Tips</p>

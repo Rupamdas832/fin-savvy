@@ -45,8 +45,8 @@ const FixedExpenses = () => {
       parentDonation +
       otherBills;
     setTotalExpenses(expenses);
-    window.scrollTo(0, 0);
   };
+
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
