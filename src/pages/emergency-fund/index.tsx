@@ -22,14 +22,15 @@ const tipsListEmergencyFund = [
 ];
 
 const EmergencyFund = () => {
-  const [income, setIncome] = useState(0);
+  const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [savings, setSavings] = useState(0);
+  const [fixedExpenses, setFixedExpenses] = useState(0);
   const [stability, setStability] = useState(5);
   const [emergencyFund, setEmergencyFund] = useState(0);
 
   const handleCalculateClick = () => {
-    if (income) {
-      const requiredFund = (income * 24) / stability;
+    if (monthlyIncome & fixedExpenses) {
+      const requiredFund = fixedExpenses * 6 + monthlyIncome * (3 / stability);
       setEmergencyFund(Math.round(requiredFund));
     }
   };
@@ -54,7 +55,7 @@ const EmergencyFund = () => {
               placeholder="50000"
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
-              onChange={(e) => setIncome(Number(e.target.value))}
+              onChange={(e) => setMonthlyIncome(Number(e.target.value))}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -66,6 +67,18 @@ const EmergencyFund = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setSavings(Number(e.target.value))}
+            />
+          </div>
+          <div className="flex flex-col mt-4">
+            <label className="font-bold">
+              My monthly fixed expenses is{" "}
+              <span className="text-gray-400">Rs.</span>
+            </label>
+            <input
+              placeholder="200000"
+              className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
+              type="number"
+              onChange={(e) => setFixedExpenses(Number(e.target.value))}
             />
           </div>
           <div className="flex flex-col mt-4">

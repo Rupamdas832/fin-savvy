@@ -5,6 +5,9 @@ import TipsCard from "@/components/tipsCard/TipsCard";
 import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
+import { SavingType } from "@/types/finance.type";
+import { useRouter } from "next/router";
+import { UserType } from "@/types/user.type";
 
 const tipsListEmergencyFund = [
   {
@@ -17,21 +20,73 @@ const tipsListEmergencyFund = [
   },
 ];
 
-const Savings = () => {
-  const [bankBalance, setBankBalance] = useState(0);
-  const [fdBalance, setFDBalance] = useState(0);
-  const [equityBalance, setEquityBalance] = useState(0);
-  const [goldBalance, setGoldBalance] = useState(0);
-  const [totalSavings, setTotalSavings] = useState(0);
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { id } = query;
+  let savingsData = {};
+  let usersData = {};
+  try {
+    const res = await fetch(`http://localhost:3000/users/${id}/savings`);
+    savingsData = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    const res = await fetch(`http://localhost:3000/users/${id}`);
+    usersData = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { savings: savingsData, user: usersData },
+  };
+}
+
+interface SavingsProps {
+  savings: SavingType;
+  user: UserType;
+}
+
+const Savings = ({ savings, user }: SavingsProps) => {
+  const [bankBalance, setBankBalance] = useState(savings.bank_balance);
+  const [fdBalance, setFDBalance] = useState(savings.fd_balance);
+  const [equityBalance, setEquityBalance] = useState(savings.equity_balance);
+  const [goldBalance, setGoldBalance] = useState(savings.gold_balance);
+  const [totalSavings, setTotalSavings] = useState(savings.total_savings);
+  const { query } = useRouter();
+  const { id } = query;
+
+  const updateSavingsApi = async (payload: SavingType) => {
+    try {
+      const res = await fetch(`http://localhost:3000/users/${id}/savings`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      console.log("data", data);
+      setTotalSavings(payload.total_savings);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCalculateClick = () => {
-    const savings = bankBalance + fdBalance + equityBalance + goldBalance;
-    setTotalSavings(savings);
+    const total_savings = bankBalance + fdBalance + equityBalance + goldBalance;
+
+    const newSavings: SavingType = {
+      ...savings,
+      bank_balance: bankBalance,
+      fd_balance: fdBalance,
+      equity_balance: equityBalance,
+      gold_balance: goldBalance,
+      total_savings: total_savings,
+    };
+    updateSavingsApi(newSavings);
   };
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar />
+        <Navbar user_id={user.user_id} first_name={user.first_name} />
         <div className="flex flex-col p-4">
           <div className="flex items-center">
             <p className="text-2xl font-bold mr-2">Total Savings</p>
@@ -51,6 +106,7 @@ const Savings = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setBankBalance(Number(e.target.value))}
+              value={bankBalance}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -62,6 +118,7 @@ const Savings = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setFDBalance(Number(e.target.value))}
+              value={fdBalance}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -74,6 +131,7 @@ const Savings = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEquityBalance(Number(e.target.value))}
+              value={equityBalance}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -86,6 +144,7 @@ const Savings = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setGoldBalance(Number(e.target.value))}
+              value={goldBalance}
             />
           </div>
           <div className="mt-4">

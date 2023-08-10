@@ -6,12 +6,13 @@ import {
   faSackDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
-import { FcPlus } from "react-icons/fc";
-import { FcDebt } from "react-icons/fc";
-import { FcPaid } from "react-icons/fc";
 import { useRouter } from "next/router";
 
-const OverviewBanner = () => {
+interface OverviewBannerProps {
+  user_id: string;
+}
+
+const OverviewBanner = ({ user_id }: OverviewBannerProps) => {
   const router = useRouter();
 
   return (

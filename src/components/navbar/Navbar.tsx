@@ -1,11 +1,17 @@
+import { UserType } from "@/types/user.type";
 import Link from "next/link";
 
-const Navbar = () => {
+interface NavbarProps {
+  user_id?: string;
+  first_name?: string;
+}
+
+const Navbar = ({ user_id, first_name }: NavbarProps) => {
   return (
     <div className="flex justify-between p-3 w-full h-fit sticky bg-black text-white">
       <div>
         <Link href="/dashboard">
-          <p className="text-base font-bold">Hello, Rupam!</p>
+          <p className="text-base font-bold">Hello, {first_name}!</p>
         </Link>
       </div>
       <div>
