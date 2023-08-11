@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 const EmergencyFund = () => {
   const router = useRouter();
   const handleLoginClick = () => {
-    router.push("/dashboard");
+    router.push("/dashboard/1");
   };
 
   return (

@@ -4,11 +4,14 @@ import DashboardHeroBanner from "@/modules/dashboardModules/heroBanner/Dashboard
 import OverviewBanner from "@/modules/dashboardModules/overviewBanner/OverviewBanner";
 import GoalBanner from "@/modules/dashboardModules/goalBanner/GoalBanner";
 import { UserType } from "@/types/user.type";
+import { originUrl } from "@/api/api";
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { id } = query;
   let data = {};
   try {
-    const res = await fetch("http://localhost:3000/users/1");
+    const res = await fetch(originUrl + `/users/${id}`);
     data = await res.json();
   } catch (error) {
     console.log(error);
