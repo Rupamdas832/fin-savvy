@@ -73,6 +73,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
   const { id } = query;
 
   const updateExpenseApi = async (payload: IFixedExpense) => {
+    const origin = window.location.origin;
     try {
       const res = await fetch(origin + `/users/${id}/fixed-expenses`, {
         method: "PUT",
@@ -136,7 +137,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setIncome(Number(e.target.value))}
-              value={income}
+              value={income.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -149,7 +150,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setHouseRent(Number(e.target.value))}
-              value={houseRent}
+              value={houseRent.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -162,7 +163,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setElectricityBill(Number(e.target.value))}
-              value={electricityBill}
+              value={electricityBill.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -176,7 +177,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setUtilityBills(Number(e.target.value))}
-              value={utilityBills}
+              value={utilityBills.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -189,7 +190,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setGroceryBills(Number(e.target.value))}
-              value={groceryBills}
+              value={groceryBills.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -202,7 +203,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setCommuteBills(Number(e.target.value))}
-              value={commuteBills}
+              value={commuteBills.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -215,7 +216,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEMI(Number(e.target.value))}
-              value={emi}
+              value={emi.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -229,7 +230,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setOTTBills(Number(e.target.value))}
-              value={ottBills}
+              value={ottBills.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -242,7 +243,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setParentDonation(Number(e.target.value))}
-              value={parentDonation}
+              value={parentDonation.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -254,7 +255,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setOtherBills(Number(e.target.value))}
-              value={otherBills}
+              value={otherBills.toString()}
             />
           </div>
           <div className="mt-4">

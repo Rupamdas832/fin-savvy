@@ -62,9 +62,9 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
   );
   const { query } = useRouter();
   const { id } = query;
-  const origin = window.location.origin;
 
   const updateEmergencyApi = async (payload: any) => {
+    const origin = window.location.origin;
     try {
       const res = await fetch(origin + `/users/${id}/emergency-fund`, {
         method: "PUT",
@@ -111,7 +111,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setMonthlyIncome(Number(e.target.value))}
-              value={monthlyIncome}
+              value={monthlyIncome.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -123,7 +123,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setSavings(Number(e.target.value))}
-              value={savings}
+              value={savings.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -136,14 +136,14 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setFixedExpenses(Number(e.target.value))}
-              value={fixedExpenses}
+              value={fixedExpenses.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
             <label className="font-bold">How much stable is your income?</label>
             <select
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
-              value={stability}
+              value={stability.toString()}
               onChange={(e) => setStability(Number(e.target.value))}
             >
               <option value={5}>Very stable</option>

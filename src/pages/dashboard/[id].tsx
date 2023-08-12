@@ -40,7 +40,7 @@ const Dashboard = ({ user, finance }: DashboardProps) => {
       <div className="flex flex-col w-full">
         <Navbar user_id={user.user_id} first_name={user.first_name} />
         <DashboardHeroBanner user={user} finance={finance} />
-        <OverviewBanner user_id={user.user_id} />
+        <OverviewBanner user_id={user.user_id} finance={finance} />
         <GoalBanner />
       </div>
     </Layout>

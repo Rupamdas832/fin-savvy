@@ -38,7 +38,7 @@ const finance: FinanceType[] = [
     },
     emergency_fund: 0,
     monthly_income: 0,
-    job_stability: 0,
+    job_stability: 3,
   },
 ];
 

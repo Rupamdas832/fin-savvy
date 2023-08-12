@@ -56,9 +56,9 @@ const Savings = ({ savings, user }: SavingsProps) => {
   const [totalSavings, setTotalSavings] = useState(savings.total_savings);
   const { query } = useRouter();
   const { id } = query;
-  const origin = window.location.origin;
 
   const updateSavingsApi = async (payload: SavingType) => {
+    const origin = window.location.origin;
     try {
       const res = await fetch(origin + `/users/${id}/savings`, {
         method: "PUT",
@@ -107,7 +107,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setBankBalance(Number(e.target.value))}
-              value={bankBalance}
+              value={bankBalance.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -119,7 +119,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setFDBalance(Number(e.target.value))}
-              value={fdBalance}
+              value={fdBalance.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -132,7 +132,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEquityBalance(Number(e.target.value))}
-              value={equityBalance}
+              value={equityBalance.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -145,7 +145,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setGoldBalance(Number(e.target.value))}
-              value={goldBalance}
+              value={goldBalance.toString()}
             />
           </div>
           <div className="mt-4">

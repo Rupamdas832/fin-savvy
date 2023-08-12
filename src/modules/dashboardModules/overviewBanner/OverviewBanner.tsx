@@ -7,13 +7,23 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
+import { FinanceType } from "@/types/finance.type";
 
 interface OverviewBannerProps {
   user_id: string;
+  finance: FinanceType;
 }
 
-const OverviewBanner = ({ user_id }: OverviewBannerProps) => {
+const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
   const router = useRouter();
+
+  const getPercentage = () => {
+    const p =
+      ((finance?.savings?.bank_balance + finance?.savings?.fd_balance) /
+        finance?.emergency_fund) *
+      100;
+    return p.toFixed();
+  };
 
   return (
     <div className="flex flex-col p-4 bg-white rounded-t-2xl text-black">
@@ -28,7 +38,9 @@ const OverviewBanner = ({ user_id }: OverviewBannerProps) => {
             <p className="text-sm">Emergency Fund</p>
           </div>
           <div>
-            <p className="text-sm font-bold">10%</p>
+            <p className="text-sm font-bold">
+              {finance?.emergency_fund ? getPercentage() : 0}%
+            </p>
           </div>
         </div>
         <div
