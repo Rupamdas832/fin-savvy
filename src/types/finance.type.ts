@@ -41,4 +41,6 @@ export type FinanceType = {
   insurance: InsuranceType;
   debt: DebtType;
   emergency_fund: number;
+  monthly_income: number;
+  job_stability: number;
 };

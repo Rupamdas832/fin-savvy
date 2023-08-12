@@ -8,6 +8,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import LogoBadge from "@/components/badge/LogoBadge";
+import { originUrl } from "@/api/api";
+import { useRouter } from "next/router";
+import absoluteUrl from "next-absolute-url";
 
 const tipsListEmergencyFund = [
   { id: 1, text: "Invest in liquid assets to build your emergency fund." },
@@ -21,23 +24,76 @@ const tipsListEmergencyFund = [
   },
 ];
 
-const EmergencyFund = () => {
-  const [monthlyIncome, setMonthlyIncome] = useState(0);
-  const [savings, setSavings] = useState(0);
-  const [fixedExpenses, setFixedExpenses] = useState(0);
-  const [stability, setStability] = useState(5);
-  const [emergencyFund, setEmergencyFund] = useState(0);
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { id } = query;
+  let data = {};
+  try {
+    const res = await fetch(originUrl + `/users/${id}/emergency-fund`);
+    data = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { emergencyFundData: data },
+  };
+}
+
+interface EmergencyFundProps {
+  emergencyFundData: {
+    emergency_fund: number;
+    monthly_income: number;
+    job_stability: number;
+    savings: number;
+    total_fixed_expenses: number;
+  };
+}
+const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
+  const [monthlyIncome, setMonthlyIncome] = useState(
+    emergencyFundData?.monthly_income
+  );
+  const [savings, setSavings] = useState(emergencyFundData?.savings);
+  const [fixedExpenses, setFixedExpenses] = useState(
+    emergencyFundData?.total_fixed_expenses
+  );
+  const [stability, setStability] = useState(emergencyFundData?.job_stability);
+  const [emergencyFund, setEmergencyFund] = useState(
+    emergencyFundData?.emergency_fund
+  );
+  const { query } = useRouter();
+  const { id } = query;
+  const origin = process.env.REACT_APP_SERVER;
+  console.log(origin);
+
+  const updateEmergencyApi = async (payload: any) => {
+    try {
+      const res = await fetch(origin + `/users/${id}/emergency-fund`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setEmergencyFund(payload.emergency_fund);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCalculateClick = () => {
     if (monthlyIncome & fixedExpenses) {
       const requiredFund = fixedExpenses * 6 + monthlyIncome * (3 / stability);
-      setEmergencyFund(Math.round(requiredFund));
+      const newEmergencyFund = {
+        emergency_fund: requiredFund,
+        monthly_income: monthlyIncome,
+        job_stability: stability,
+      };
+      updateEmergencyApi(newEmergencyFund);
     }
   };
+
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar />
+        <Navbar user_id={id as string} />
         <div className="flex flex-col p-4">
           <div className="flex items-center">
             <p className="text-2xl font-bold mr-2">Emergency Fund</p>
@@ -56,6 +112,7 @@ const EmergencyFund = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setMonthlyIncome(Number(e.target.value))}
+              value={monthlyIncome}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -67,6 +124,7 @@ const EmergencyFund = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setSavings(Number(e.target.value))}
+              value={savings}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -79,6 +137,7 @@ const EmergencyFund = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setFixedExpenses(Number(e.target.value))}
+              value={fixedExpenses}
             />
           </div>
           <div className="flex flex-col mt-4">
