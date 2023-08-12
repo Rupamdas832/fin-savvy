@@ -13,10 +13,10 @@ const finance: FinanceType[] = [
       ott_bill: 0,
       parent_donation: 0,
       other_bill: 0,
-      total_fixed_expenses: 0,
+      total_fixed_expenses: 10,
     },
     savings: {
-      bank_balance: 100,
+      bank_balance: 0,
       fd_balance: 0,
       equity_balance: 0,
       gold_balance: 0,
