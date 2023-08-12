@@ -16,6 +16,7 @@ export async function GET(request: any, { params }: any) {
         house_rent: 0,
         electricity_bill: 0,
         utility_bill: 0,
+        food_bill: 0,
         commute_bill: 0,
         ott_bill: 0,
         parent_donation: 0,
@@ -44,6 +45,8 @@ export async function GET(request: any, { params }: any) {
         total_loan_amount: 0,
       },
       emergency_fund: 0,
+      monthly_income: 0,
+      job_stability: 3,
     };
     finances.push(newData);
   }
