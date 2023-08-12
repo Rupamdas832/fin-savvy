@@ -1,7 +1,8 @@
-export type ExpenseType = {
+export type FixedExpenseType = {
   house_rent: number;
   electricity_bill: number;
   utility_bill: number;
+  food_bill: number;
   commute_bill: number;
   ott_bill: number;
   parent_donation: number;
@@ -36,7 +37,7 @@ export type DebtType = {
 export type FinanceType = {
   user_finance_id: string;
   user_id: string;
-  fixed_expenses: ExpenseType;
+  fixed_expenses: FixedExpenseType;
   savings: SavingType;
   insurance: InsuranceType;
   debt: DebtType;

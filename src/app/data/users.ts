@@ -14,11 +14,6 @@ const users: UserType[] = [
       pincode: 831002,
     },
     phone: 9876543210,
-    finances: {
-      monthly_income: 100000,
-      fixed_expenses: 35000,
-      bank_balance: 200000,
-    },
   },
   {
     user_id: "2",
@@ -33,11 +28,6 @@ const users: UserType[] = [
       pincode: 90566,
     },
     phone: 9876543210,
-    finances: {
-      monthly_income: 0,
-      fixed_expenses: 0,
-      bank_balance: 0,
-    },
   },
 ];
 

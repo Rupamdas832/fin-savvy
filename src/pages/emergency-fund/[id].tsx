@@ -62,8 +62,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
   );
   const { query } = useRouter();
   const { id } = query;
-  const origin = process.env.REACT_APP_SERVER;
-  console.log(origin);
+  const origin = window.location.origin;
 
   const updateEmergencyApi = async (payload: any) => {
     try {

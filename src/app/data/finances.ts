@@ -8,6 +8,7 @@ const finance: FinanceType[] = [
       house_rent: 0,
       electricity_bill: 0,
       utility_bill: 0,
+      food_bill: 0,
       commute_bill: 0,
       ott_bill: 0,
       parent_donation: 0,
@@ -36,6 +37,8 @@ const finance: FinanceType[] = [
       total_loan_amount: 0,
     },
     emergency_fund: 0,
+    monthly_income: 0,
+    job_stability: 0,
   },
 ];
 

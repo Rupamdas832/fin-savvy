@@ -8,6 +8,9 @@ import { useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FixedExpenseType } from "@/types/finance.type";
+import { useRouter } from "next/router";
+import { originUrl } from "@/api/api";
 
 const tipsListEmergencyFund = [
   {
@@ -20,21 +23,70 @@ const tipsListEmergencyFund = [
   },
 ];
 
-const FixedExpenses = () => {
-  const [income, setIncome] = useState(0);
-  const [houseRent, setHouseRent] = useState(0);
-  const [electricityBill, setElectricityBill] = useState(0);
-  const [utilityBills, setUtilityBills] = useState(0);
-  const [groceryBills, setGroceryBills] = useState(0);
-  const [commuteBills, setCommuteBills] = useState(0);
-  const [emi, setEMI] = useState(0);
-  const [ottBills, setOTTBills] = useState(0);
-  const [parentDonation, setParentDonation] = useState(0);
-  const [otherBills, setOtherBills] = useState(0);
-  const [totalExpenses, setTotalExpenses] = useState(0);
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { id } = query;
+  let expensesData = {};
+  try {
+    const res = await fetch(originUrl + `/users/${id}/fixed-expenses`);
+    expensesData = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { fixed_expenses: expensesData },
+  };
+}
+
+interface IFixedExpense extends FixedExpenseType {
+  monthly_income: number;
+  total_emi: number;
+}
+
+interface FixedExpensesProps {
+  fixed_expenses: IFixedExpense;
+}
+
+const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
+  const [income, setIncome] = useState(fixed_expenses?.monthly_income);
+  const [houseRent, setHouseRent] = useState(fixed_expenses?.house_rent);
+  const [electricityBill, setElectricityBill] = useState(
+    fixed_expenses?.electricity_bill
+  );
+  const [utilityBills, setUtilityBills] = useState(
+    fixed_expenses?.utility_bill
+  );
+  const [groceryBills, setGroceryBills] = useState(fixed_expenses?.food_bill);
+  const [commuteBills, setCommuteBills] = useState(
+    fixed_expenses?.commute_bill
+  );
+  const [emi, setEMI] = useState(fixed_expenses?.total_emi);
+  const [ottBills, setOTTBills] = useState(fixed_expenses?.ott_bill);
+  const [parentDonation, setParentDonation] = useState(
+    fixed_expenses?.parent_donation
+  );
+  const [otherBills, setOtherBills] = useState(fixed_expenses?.other_bill);
+  const [totalExpenses, setTotalExpenses] = useState(
+    fixed_expenses?.total_fixed_expenses
+  );
+  const { query } = useRouter();
+  const { id } = query;
+
+  const updateExpenseApi = async (payload: IFixedExpense) => {
+    try {
+      const res = await fetch(origin + `/users/${id}/fixed-expenses`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setTotalExpenses(payload.total_fixed_expenses);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCalculateClick = () => {
-    const expenses =
+    const _totalExpense =
       houseRent +
       electricityBill +
       utilityBills +
@@ -44,7 +96,22 @@ const FixedExpenses = () => {
       ottBills +
       parentDonation +
       otherBills;
-    setTotalExpenses(expenses);
+
+    const payload: IFixedExpense = {
+      ...fixed_expenses,
+      monthly_income: income,
+      house_rent: houseRent,
+      electricity_bill: electricityBill,
+      utility_bill: utilityBills,
+      food_bill: groceryBills,
+      commute_bill: commuteBills,
+      total_emi: emi,
+      ott_bill: ottBills,
+      parent_donation: parentDonation,
+      other_bill: otherBills,
+      total_fixed_expenses: _totalExpense,
+    };
+    updateExpenseApi(payload);
   };
 
   return (
@@ -69,6 +136,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setIncome(Number(e.target.value))}
+              value={income}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -81,6 +149,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setHouseRent(Number(e.target.value))}
+              value={houseRent}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -93,6 +162,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setElectricityBill(Number(e.target.value))}
+              value={electricityBill}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -106,6 +176,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setUtilityBills(Number(e.target.value))}
+              value={utilityBills}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -118,6 +189,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setGroceryBills(Number(e.target.value))}
+              value={groceryBills}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -130,6 +202,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setCommuteBills(Number(e.target.value))}
+              value={commuteBills}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -142,6 +215,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEMI(Number(e.target.value))}
+              value={emi}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -155,6 +229,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setOTTBills(Number(e.target.value))}
+              value={ottBills}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -167,6 +242,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setParentDonation(Number(e.target.value))}
+              value={parentDonation}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -178,6 +254,7 @@ const FixedExpenses = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setOtherBills(Number(e.target.value))}
+              value={otherBills}
             />
           </div>
           <div className="mt-4">

@@ -14,7 +14,7 @@ import LogoBadge from "@/components/badge/LogoBadge";
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "@/components/modal/Modal";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const expenseCategory = [
   {
@@ -77,6 +77,8 @@ const Expenses = () => {
   const [expenseList, setExpenseList] = useState(expenseListMock);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const { query } = router;
+  const { id } = query;
 
   const handleAddClick = () => {
     if (title && expenseCategoryId && amount) {
@@ -116,7 +118,7 @@ const Expenses = () => {
             </div>
             <Button
               text="Fixed expenses"
-              onClick={() => router.push("/expenses/fixed")}
+              onClick={() => router.push(`/expenses/${id}/fixed`)}
             />
           </div>
           <p className="text-sm  mt-2">

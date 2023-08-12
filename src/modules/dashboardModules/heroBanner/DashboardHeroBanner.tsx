@@ -4,12 +4,14 @@ import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { UserType } from "@/types/user.type";
+import { FinanceType } from "@/types/finance.type";
 
 interface DashboardHeroBannerProps {
   user: UserType;
+  finance: FinanceType;
 }
 
-const DashboardHeroBanner = ({ user }: DashboardHeroBannerProps) => {
+const DashboardHeroBanner = ({ user, finance }: DashboardHeroBannerProps) => {
   const router = useRouter();
   return (
     <div className="flex flex-col p-4">
@@ -23,7 +25,9 @@ const DashboardHeroBanner = ({ user }: DashboardHeroBannerProps) => {
         />
         <div className="flex flex-col ml-4">
           <p className="text-sm">Total Savings</p>
-          <p className="text-base font-bold">₹ {user.finances.bank_balance}</p>
+          <p className="text-base font-bold">
+            ₹ {finance?.savings?.total_savings ?? 0}
+          </p>
         </div>
       </div>
       <div className="flex justify-between gap-4 mt-4">
@@ -35,13 +39,13 @@ const DashboardHeroBanner = ({ user }: DashboardHeroBannerProps) => {
           <div className="flex flex-col ml-4">
             <p className="text-sm">Income</p>
             <p className="text-base font-bold">
-              ₹ {user.finances.monthly_income}
+              ₹ {finance?.monthly_income ?? 0}
             </p>
           </div>
         </div>
         <div
           className="flex flex-1 items-center p-4 rounded-2xl bg-gray-800 cursor-pointer"
-          onClick={() => router.push("/expenses")}
+          onClick={() => router.push(`/expenses/${user.user_id}`)}
         >
           <FontAwesomeIcon
             icon={faCircleDown}
@@ -50,7 +54,7 @@ const DashboardHeroBanner = ({ user }: DashboardHeroBannerProps) => {
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
-              ₹ {user.finances.fixed_expenses}
+              ₹ {finance?.fixed_expenses?.total_fixed_expenses ?? 0}
             </p>
           </div>
         </div>

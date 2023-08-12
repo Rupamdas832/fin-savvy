@@ -11,9 +11,4 @@ export type UserType = {
     pincode: number;
   };
   phone: number;
-  finances: {
-    monthly_income: number;
-    fixed_expenses: number;
-    bank_balance: number;
-  };
 };
