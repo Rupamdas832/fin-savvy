@@ -1,3 +1,5 @@
+"use client";
+
 import { z } from "zod";
 
 export const generalErrorHandling = (err: any, NextResponse: any) => {
