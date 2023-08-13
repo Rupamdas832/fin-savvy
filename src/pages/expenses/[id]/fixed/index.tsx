@@ -80,7 +80,9 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      setTotalExpenses(payload.total_fixed_expenses);
+      if (res.status === 200) {
+        setTotalExpenses(data.total_fixed_expenses);
+      }
     } catch (error) {
       console.log(error);
     }

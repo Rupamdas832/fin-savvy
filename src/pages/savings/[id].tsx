@@ -65,7 +65,9 @@ const Savings = ({ savings, user }: SavingsProps) => {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      setTotalSavings(payload.total_savings);
+      if (res.status === 200) {
+        setTotalSavings(data.total_savings);
+      }
     } catch (error) {
       console.log(error);
     }

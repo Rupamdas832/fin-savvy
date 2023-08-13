@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import finances from "@/app/data/finances";
 import { FinanceType } from "@/types/finance.type";
 import { calculateEmergencyFund } from "@/utils/businessLogics";
+import { z } from "zod";
+import users from "@/app/data/users";
+import { generalErrorHandling } from "@/app/utils/error";
+
+const EmergencyFundSchema = z.object({
+  monthly_income: z.number(),
+  job_stability: z.number(),
+  total_fixed_expenses: z.number(),
+});
 
 export async function GET(request: any, { params }: any) {
   const requiredData = finances.find((user) => user.user_id === params.id);
@@ -26,27 +35,34 @@ export async function GET(request: any, { params }: any) {
 export async function PUT(req: any, { params }: any) {
   const requestBody = await req.json();
 
-  const requiredIndex = finances.findIndex(
-    (user) => user.user_id === params.id
-  );
-  const requiredData = finances[requiredIndex];
-  if (!requiredData) {
-    return NextResponse.json({ error: "User not found" });
+  try {
+    const validatedReq = EmergencyFundSchema.parse(requestBody);
+    const requiredIndex = finances.findIndex(
+      (user) => user.user_id === params.id
+    );
+    const requiredData = finances[requiredIndex];
+    if (!requiredData) {
+      const requiredUser = users.find((user) => user.user_id === params.id);
+      if (!requiredUser) return NextResponse.json({ error: "User not found" });
+    }
+
+    const requiredFund = calculateEmergencyFund({
+      total_fixed_expenses: validatedReq?.total_fixed_expenses,
+      monthly_income: validatedReq?.monthly_income,
+      job_stability: validatedReq?.job_stability,
+    });
+
+    const updatedData: FinanceType = {
+      ...requiredData,
+      emergency_fund: requiredFund,
+      monthly_income: validatedReq?.monthly_income,
+      job_stability: validatedReq?.job_stability,
+    };
+    finances[requiredIndex] = updatedData;
+
+    return NextResponse.json({ emergency_fund: requiredFund });
+  } catch (err) {
+    console.log(err);
+    return generalErrorHandling(err);
   }
-
-  const requiredFund = calculateEmergencyFund({
-    total_fixed_expenses: requestBody?.total_fixed_expenses,
-    monthly_income: requestBody?.monthly_income,
-    job_stability: requestBody?.job_stability,
-  });
-
-  const updatedData: FinanceType = {
-    ...requiredData,
-    emergency_fund: requiredFund,
-    monthly_income: requestBody?.monthly_income,
-    job_stability: requestBody?.job_stability,
-  };
-  finances[requiredIndex] = updatedData;
-
-  return NextResponse.json({ emergency_fund: requiredFund });
 }

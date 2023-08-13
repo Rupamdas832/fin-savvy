@@ -93,7 +93,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const [title, setTitle] = useState("");
   const [expenseCategoryId, setExpenseCategoryId] = useState("");
   const [amount, setAmount] = useState(0);
-  const [createdAt, setCreatedAt] = useState(new Date());
+  const [createdAt, setCreatedAt] = useState("");
   const [expenseList, setExpenseList] = useState(expenses);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
@@ -108,7 +108,9 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      setExpenseList((expenseList) => [...expenseList, data]);
+      if (res.status === 200) {
+        setExpenseList((expenseList) => [...expenseList, data]);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -134,7 +136,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
     setTitle("");
     setAmount(0);
     setExpenseCategoryId("");
-    setCreatedAt(new Date());
+    setCreatedAt("");
     setIsModalOpen(false);
   };
 
@@ -255,7 +257,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
                   <input
                     className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
                     type="date"
-                    onChange={(e) => setCreatedAt(new Date(e.target.value))}
+                    onChange={(e) => setCreatedAt(e.target.value)}
                   />
                 </div>
                 <div className="mt-4">

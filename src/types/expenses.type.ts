@@ -4,5 +4,5 @@ export type ExpenseType = {
   description: string;
   amount: number;
   expense_category_id: string;
-  created_at: Date;
+  created_at: string;
 };
