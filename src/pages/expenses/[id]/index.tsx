@@ -15,6 +15,9 @@ import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "@/components/modal/Modal";
 import { useRouter } from "next/router";
+import { originUrl } from "@/api/api";
+import { ExpenseType } from "@/types/expenses.type";
+import { UserType } from "@/types/user.type";
 
 const expenseCategory = [
   {
@@ -55,42 +58,75 @@ const expenseCategory = [
   },
 ];
 
-const expenseListMock = [
-  {
-    expense_id: "1",
-    title: "Nike shoes",
-    expense_category_id: "2",
-    amount: 4000,
-    created_at: "Sat Aug 01 2023 20:17:06 GMT+0530 (India Standard Time)",
-  },
-];
-
 const getCategory = (id: string) => {
   return expenseCategory.find((item) => item.expense_category_id === id);
 };
 
-const Expenses = () => {
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { id } = query;
+  let expensesData = [];
+  let usersData = {};
+  try {
+    const res = await fetch(originUrl + `/users/${id}/expenses`);
+    expensesData = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    const res = await fetch(originUrl + `/users/${id}`);
+    usersData = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { expenses: expensesData, user: usersData },
+  };
+}
+
+interface ExpensesProps {
+  expenses: ExpenseType[];
+  user: UserType;
+}
+
+const Expenses = ({ expenses, user }: ExpensesProps) => {
   const [title, setTitle] = useState("");
   const [expenseCategoryId, setExpenseCategoryId] = useState("");
   const [amount, setAmount] = useState(0);
-  const [createdAt, setCreatedAt] = useState(String(new Date()));
-  const [expenseList, setExpenseList] = useState(expenseListMock);
+  const [createdAt, setCreatedAt] = useState(new Date());
+  const [expenseList, setExpenseList] = useState(expenses);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
   const { query } = router;
   const { id } = query;
 
+  const postNewExpense = async (payload: ExpenseType) => {
+    const origin = window.location.origin;
+    try {
+      const res = await fetch(origin + `/users/${id}/expenses`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setExpenseList((expenseList) => [...expenseList, data]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      handleResetModal();
+    }
+  };
+
   const handleAddClick = () => {
     if (title && expenseCategoryId && amount) {
-      const newExpense = {
+      const newExpense: ExpenseType = {
+        user_id: user?.user_id,
         expense_id: `${expenseList.length + 1}`,
-        title,
+        description: title,
         expense_category_id: expenseCategoryId,
         amount,
         created_at: createdAt,
       };
-      setExpenseList((expenseList) => [...expenseList, newExpense]);
-      handleResetModal();
+      postNewExpense(newExpense);
     }
   };
 
@@ -98,7 +134,7 @@ const Expenses = () => {
     setTitle("");
     setAmount(0);
     setExpenseCategoryId("");
-    setCreatedAt(String(new Date()));
+    setCreatedAt(new Date());
     setIsModalOpen(false);
   };
 
@@ -139,6 +175,11 @@ const Expenses = () => {
               />
             </button>
           </div>
+          {expenseList.length === 0 && (
+            <p className="text-xl font-bold text-center mt-8">
+              No expenses yet!
+            </p>
+          )}
           <div className="flex flex-col-reverse mt-4">
             {expenseList.map((expense) => {
               const category = getCategory(expense.expense_category_id);
@@ -150,7 +191,9 @@ const Expenses = () => {
                   <div className="flex items-center w-3/5">
                     <LogoBadge logo={category?.logo} color={category?.color} />
                     <div className="flex flex-col flex-1 ml-2">
-                      <p className="text-base font-bold">{expense.title}</p>
+                      <p className="text-base font-bold">
+                        {expense.description}
+                      </p>
                       <p className="text-sm">{category?.title}</p>
                     </div>
                   </div>
@@ -212,7 +255,7 @@ const Expenses = () => {
                   <input
                     className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
                     type="date"
-                    onChange={(e) => setCreatedAt(e.target.value)}
+                    onChange={(e) => setCreatedAt(new Date(e.target.value))}
                   />
                 </div>
                 <div className="mt-4">

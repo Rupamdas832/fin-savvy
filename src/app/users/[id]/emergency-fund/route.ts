@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import finances from "@/app/data/finances";
-import { FinanceType, SavingType } from "@/types/finance.type";
+import { FinanceType } from "@/types/finance.type";
+import { calculateEmergencyFund } from "@/utils/businessLogics";
 
 export async function GET(request: any, { params }: any) {
   const requiredData = finances.find((user) => user.user_id === params.id);
@@ -32,13 +33,20 @@ export async function PUT(req: any, { params }: any) {
   if (!requiredData) {
     return NextResponse.json({ error: "User not found" });
   }
+
+  const requiredFund = calculateEmergencyFund({
+    total_fixed_expenses: requestBody?.total_fixed_expenses,
+    monthly_income: requestBody?.monthly_income,
+    job_stability: requestBody?.job_stability,
+  });
+
   const updatedData: FinanceType = {
     ...requiredData,
-    emergency_fund: requestBody.emergency_fund,
-    monthly_income: requestBody.monthly_income,
-    job_stability: requestBody.job_stability,
+    emergency_fund: requiredFund,
+    monthly_income: requestBody?.monthly_income,
+    job_stability: requestBody?.job_stability,
   };
   finances[requiredIndex] = updatedData;
 
-  return NextResponse.json(updatedData);
+  return NextResponse.json({ emergency_fund: requiredFund });
 }

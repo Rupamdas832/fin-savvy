@@ -71,7 +71,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      setEmergencyFund(payload.emergency_fund);
+      setEmergencyFund(data.emergency_fund);
     } catch (error) {
       console.log(error);
     }
@@ -79,13 +79,12 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
 
   const handleCalculateClick = () => {
     if (monthlyIncome & fixedExpenses) {
-      const requiredFund = fixedExpenses * 6 + monthlyIncome * (3 / stability);
-      const newEmergencyFund = {
-        emergency_fund: requiredFund,
+      const newEmergencyFundPayload = {
         monthly_income: monthlyIncome,
         job_stability: stability,
+        total_fixed_expenses: fixedExpenses,
       };
-      updateEmergencyApi(newEmergencyFund);
+      updateEmergencyApi(newEmergencyFundPayload);
     }
   };
 
