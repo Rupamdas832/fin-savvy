@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export const generalErrorHandling = (err: any) => {
+export const generalErrorHandling = (err: any, NextResponse: any) => {
   if (err instanceof z.ZodError) {
     const errors = err.format();
     return NextResponse.json({ errors }, { status: 400 });

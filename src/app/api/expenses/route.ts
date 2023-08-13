@@ -38,6 +38,6 @@ export async function POST(req: any) {
     return NextResponse.json(updatedData);
   } catch (err) {
     console.log(err);
-    return generalErrorHandling(err);
+    return generalErrorHandling(err, NextResponse);
   }
 }

@@ -78,6 +78,6 @@ export async function PUT(req: any, { params }: any) {
     return NextResponse.json(updatedData.fixed_expenses);
   } catch (err) {
     console.log(err);
-    return generalErrorHandling(err);
+    return generalErrorHandling(err, NextResponse);
   }
 }

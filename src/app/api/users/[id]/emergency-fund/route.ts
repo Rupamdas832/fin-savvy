@@ -63,6 +63,6 @@ export async function PUT(req: any, { params }: any) {
     return NextResponse.json({ emergency_fund: requiredFund });
   } catch (err) {
     console.log(err);
-    return generalErrorHandling(err);
+    return generalErrorHandling(err, NextResponse);
   }
 }
