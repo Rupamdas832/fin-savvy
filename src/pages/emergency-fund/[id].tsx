@@ -29,7 +29,7 @@ export async function getServerSideProps(context: any) {
   const { id } = query;
   let data = {};
   try {
-    const res = await fetch(originUrl + `/users/${id}/emergency-fund`);
+    const res = await fetch(originUrl + `/api/users/${id}/emergency-fund`);
     data = await res.json();
   } catch (error) {
     console.log(error);
@@ -66,7 +66,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
   const updateEmergencyApi = async (payload: any) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/users/${id}/emergency-fund`, {
+      const res = await fetch(origin + `/api/users/${id}/emergency-fund`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });

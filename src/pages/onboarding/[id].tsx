@@ -9,7 +9,7 @@ export async function getServerSideProps(context: any) {
   const { id } = query;
   let data = {};
   try {
-    const res = await fetch(originUrl + `/users/${id}/finances`);
+    const res = await fetch(originUrl + `/api/users/${id}/finances`);
     data = await res.json();
   } catch (error) {
     console.log(error);

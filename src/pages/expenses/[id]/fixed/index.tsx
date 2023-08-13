@@ -28,7 +28,7 @@ export async function getServerSideProps(context: any) {
   const { id } = query;
   let expensesData = {};
   try {
-    const res = await fetch(originUrl + `/users/${id}/fixed-expenses`);
+    const res = await fetch(originUrl + `/api/users/${id}/fixed-expenses`);
     expensesData = await res.json();
   } catch (error) {
     console.log(error);
@@ -75,7 +75,7 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
   const updateExpenseApi = async (payload: IFixedExpense) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/users/${id}/fixed-expenses`, {
+      const res = await fetch(origin + `/api/users/${id}/fixed-expenses`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });

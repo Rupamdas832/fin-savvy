@@ -68,13 +68,13 @@ export async function getServerSideProps(context: any) {
   let expensesData = [];
   let usersData = {};
   try {
-    const res = await fetch(originUrl + `/users/${id}/expenses`);
+    const res = await fetch(originUrl + `/api/expenses/${id}`);
     expensesData = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/users/${id}`);
+    const res = await fetch(originUrl + `/api/users/${id}`);
     usersData = await res.json();
   } catch (error) {
     console.log(error);
@@ -103,7 +103,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const postNewExpense = async (payload: ExpenseType) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/users/${id}/expenses`, {
+      const res = await fetch(origin + `/api/expenses`, {
         method: "POST",
         body: JSON.stringify(payload),
       });

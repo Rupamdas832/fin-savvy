@@ -5,14 +5,26 @@ import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { UserType } from "@/types/user.type";
 import { FinanceType } from "@/types/finance.type";
+import { ExpenseType } from "@/types/expenses.type";
+import { useMemo } from "react";
 
 interface DashboardHeroBannerProps {
   user: UserType;
   finance: FinanceType;
+  expenses: ExpenseType[];
 }
 
-const DashboardHeroBanner = ({ user, finance }: DashboardHeroBannerProps) => {
+const DashboardHeroBanner = ({
+  user,
+  finance,
+  expenses,
+}: DashboardHeroBannerProps) => {
   const router = useRouter();
+
+  const totalCurrentExpenses = useMemo(() => {
+    return expenses.reduce((acum, curr) => acum + curr.amount, 0);
+  }, [expenses]);
+
   return (
     <div className="flex flex-col p-4">
       <div
@@ -54,7 +66,9 @@ const DashboardHeroBanner = ({ user, finance }: DashboardHeroBannerProps) => {
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
-              ₹ {finance?.fixed_expenses?.total_fixed_expenses ?? 0}
+              ₹{" "}
+              {finance?.fixed_expenses?.total_fixed_expenses +
+                totalCurrentExpenses ?? 0}
             </p>
           </div>
         </div>

@@ -27,13 +27,13 @@ export async function getServerSideProps(context: any) {
   let savingsData = {};
   let usersData = {};
   try {
-    const res = await fetch(originUrl + `/users/${id}/savings`);
+    const res = await fetch(originUrl + `/api/users/${id}/savings`);
     savingsData = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/users/${id}`);
+    const res = await fetch(originUrl + `/api/users/${id}`);
     usersData = await res.json();
   } catch (error) {
     console.log(error);
@@ -60,7 +60,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
   const updateSavingsApi = async (payload: SavingType) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/users/${id}/savings`, {
+      const res = await fetch(origin + `/api/users/${id}/savings`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
