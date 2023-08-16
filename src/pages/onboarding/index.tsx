@@ -6,10 +6,10 @@ import { FinanceType } from "@/types/finance.type";
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let data = {};
   try {
-    const res = await fetch(originUrl + `/api/users/${id}/finances`);
+    const res = await fetch(originUrl + `/api/finances/?userId=${userId}`);
     data = await res.json();
   } catch (error) {
     console.log(error);
@@ -24,21 +24,21 @@ interface OnboardingProps {
 }
 const Onboarding = ({ finance }: OnboardingProps) => {
   const { query, push } = useRouter();
-  const { id } = query;
+  const { userId } = query;
 
   const handleSavingsClick = () => {
-    push(`/savings/${id}`);
+    push(`/savings/?userId=${userId}`);
   };
 
   const handleExpensesClick = () => {
-    push(`/expenses/${id}/fixed`);
+    push(`/expenses/fixed/?userId=${userId}`);
   };
 
   if (
     finance?.savings?.total_savings &&
     finance?.fixed_expenses?.total_fixed_expenses
   ) {
-    push(`/dashboard/${id}`);
+    push(`/dashboard/?userId=${userId}`);
   }
 
   return (

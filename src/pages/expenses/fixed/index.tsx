@@ -25,10 +25,12 @@ const tipsListEmergencyFund = [
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let expensesData = {};
   try {
-    const res = await fetch(originUrl + `/api/users/${id}/fixed-expenses`);
+    const res = await fetch(
+      originUrl + `/api/finances/fixed-expenses/?userId=${userId}`
+    );
     expensesData = await res.json();
   } catch (error) {
     console.log(error);
@@ -70,15 +72,18 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
     fixed_expenses?.total_fixed_expenses
   );
   const { query } = useRouter();
-  const { id } = query;
+  const { userId } = query;
 
   const updateExpenseApi = async (payload: IFixedExpense) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/api/users/${id}/fixed-expenses`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        origin + `/api/finances/fixed-expenses/?userId=${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (res.status === 200) {
         setTotalExpenses(data.total_fixed_expenses);

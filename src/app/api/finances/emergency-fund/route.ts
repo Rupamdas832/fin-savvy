@@ -3,8 +3,8 @@ import finances from "@/app/data/finances";
 import { FinanceType } from "@/types/finance.type";
 import { calculateEmergencyFund } from "@/utils/businessLogics";
 import { z } from "zod";
-import users from "@/app/data/users";
 import { generalErrorHandling } from "@/app/utils/error";
+import { prisma } from "@/app/db/db";
 
 const EmergencyFundSchema = z.object({
   monthly_income: z.number(),
@@ -12,8 +12,11 @@ const EmergencyFundSchema = z.object({
   total_fixed_expenses: z.number(),
 });
 
-export async function GET(request: any, { params }: any) {
-  const requiredData = finances.find((user) => user.user_id === params.id);
+export async function GET(request: any) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("userId");
+
+  const requiredData = finances.find((user) => user.user_id === userId);
   if (!requiredData) {
     return NextResponse.json({ error: "User not found" });
   }
@@ -32,17 +35,22 @@ export async function GET(request: any, { params }: any) {
   return NextResponse.json(emergency_fund);
 }
 
-export async function PUT(req: any, { params }: any) {
+export async function PUT(req: any) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
   const requestBody = await req.json();
 
   try {
     const validatedReq = EmergencyFundSchema.parse(requestBody);
-    const requiredIndex = finances.findIndex(
-      (user) => user.user_id === params.id
-    );
+    const requiredIndex = finances.findIndex((user) => user.user_id === userId);
     const requiredData = finances[requiredIndex];
-    if (!requiredData) {
-      const requiredUser = users.find((user) => user.user_id === params.id);
+    if (!requiredData && userId) {
+      const requiredUser = await prisma.user.findFirst({
+        where: {
+          user_id: { equals: userId },
+        },
+      });
+
       if (!requiredUser) return NextResponse.json({ error: "User not found" });
     }
 

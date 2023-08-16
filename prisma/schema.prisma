@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  user_id String @id @default(uuid())
+  first_name String
+  last_name String
+  email String @unique
+  created_at DateTime @default(now())
+}
+
+// model Finance {
+//   user_finance_id String @id @default(uuid())
+//   user_id String @unique
+//   user User @relation(fields: [user_id], references: [user_id])
+//   fixed_expenses FixedExpenseType
+// }
+
+// type FixedExpenseType {
+//   house_rent Int @default(0)
+//   electricity_bill Int @default(0)
+//   utility_bill Int @default(0)
+//   food_bill Int @default(0)
+//   commute_bill Int @default(0)
+//   ott_bill Int @default(0)
+//   parent_donation Int @default(0)
+//   other_bill Int @default(0)
+//   total_fixed_expenses Int @default(0)
+// }

@@ -3,7 +3,7 @@ import { FinanceType } from "@/types/finance.type";
 const finance: FinanceType[] = [
   {
     user_finance_id: "1",
-    user_id: "1",
+    user_id: "e564317f-4101-4707-9bd3-0f06aa631166",
     fixed_expenses: {
       house_rent: 0,
       electricity_bill: 0,

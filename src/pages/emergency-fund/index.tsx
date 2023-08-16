@@ -10,7 +10,6 @@ import ProgressCard from "@/components/progressCard/ProgressCard";
 import LogoBadge from "@/components/badge/LogoBadge";
 import { originUrl } from "@/api/api";
 import { useRouter } from "next/router";
-import absoluteUrl from "next-absolute-url";
 
 const tipsListEmergencyFund = [
   { id: 1, text: "Invest in liquid assets to build your emergency fund." },
@@ -26,10 +25,12 @@ const tipsListEmergencyFund = [
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let data = {};
   try {
-    const res = await fetch(originUrl + `/api/users/${id}/emergency-fund`);
+    const res = await fetch(
+      originUrl + `/api/finances/emergency-fund/?userId=${userId}`
+    );
     data = await res.json();
   } catch (error) {
     console.log(error);
@@ -61,15 +62,18 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
     emergencyFundData?.emergency_fund
   );
   const { query } = useRouter();
-  const { id } = query;
+  const { userId } = query;
 
   const updateEmergencyApi = async (payload: any) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/api/users/${id}/emergency-fund`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        origin + `/api/finances/emergency-fund/?userId=${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       setEmergencyFund(data.emergency_fund);
     } catch (error) {
@@ -91,7 +95,7 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar user_id={id as string} />
+        <Navbar user_id={userId as string} />
         <div className="flex flex-col p-4">
           <div className="flex items-center">
             <p className="text-2xl font-bold mr-2">Emergency Fund</p>

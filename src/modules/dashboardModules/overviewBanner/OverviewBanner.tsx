@@ -31,7 +31,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push(`/emergency-fund/${user_id}`)}
+          onClick={() => router.push(`/emergency-fund/?userId=${user_id}`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faSackDollar} color="bg-green-400" />

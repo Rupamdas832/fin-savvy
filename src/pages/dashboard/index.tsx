@@ -10,24 +10,24 @@ import { ExpenseType } from "@/types/expenses.type";
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let data = {};
   let financeData = {};
   let expenses = [];
   try {
-    const res = await fetch(originUrl + `/api/users/${id}`);
+    const res = await fetch(originUrl + `/api/users/?userId=${userId}`);
     data = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/api/users/${id}/finances`);
+    const res = await fetch(originUrl + `/api/finances/?userId=${userId}`);
     financeData = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/api/expenses/${id}`);
+    const res = await fetch(originUrl + `/api/expenses/?userId=${userId}`);
     expenses = await res.json();
   } catch (error) {
     console.log(error);

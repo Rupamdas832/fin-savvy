@@ -64,17 +64,17 @@ const getCategory = (id: string) => {
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let expensesData = [];
   let usersData = {};
   try {
-    const res = await fetch(originUrl + `/api/expenses/${id}`);
+    const res = await fetch(originUrl + `/api/expenses/?userId=${userId}`);
     expensesData = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/api/users/${id}`);
+    const res = await fetch(originUrl + `/api/users/?userId=${userId}`);
     usersData = await res.json();
   } catch (error) {
     console.log(error);
@@ -98,7 +98,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
   const { query } = router;
-  const { id } = query;
+  const { userId } = query;
 
   const postNewExpense = async (payload: ExpenseType) => {
     const origin = window.location.origin;
@@ -121,7 +121,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const handleAddClick = () => {
     if (title && expenseCategoryId && amount) {
       const newExpense: ExpenseType = {
-        user_id: user?.user_id,
+        user_id: user.user_id,
         expense_id: `${expenseList.length + 1}`,
         description: title,
         expense_category_id: expenseCategoryId,
@@ -156,7 +156,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
             </div>
             <Button
               text="Fixed expenses"
-              onClick={() => router.push(`/expenses/${id}/fixed`)}
+              onClick={() => router.push(`/expenses/fixed/?userId=${userId}`)}
             />
           </div>
           <p className="text-sm  mt-2">

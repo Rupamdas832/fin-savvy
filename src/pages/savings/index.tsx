@@ -23,17 +23,19 @@ const tipsListEmergencyFund = [
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const { id } = query;
+  const { userId } = query;
   let savingsData = {};
   let usersData = {};
   try {
-    const res = await fetch(originUrl + `/api/users/${id}/savings`);
+    const res = await fetch(
+      originUrl + `/api/finances/savings/?userId=${userId}`
+    );
     savingsData = await res.json();
   } catch (error) {
     console.log(error);
   }
   try {
-    const res = await fetch(originUrl + `/api/users/${id}`);
+    const res = await fetch(originUrl + `/api/users/?userId=${userId}`);
     usersData = await res.json();
   } catch (error) {
     console.log(error);
@@ -55,15 +57,18 @@ const Savings = ({ savings, user }: SavingsProps) => {
   const [goldBalance, setGoldBalance] = useState(savings.gold_balance);
   const [totalSavings, setTotalSavings] = useState(savings.total_savings);
   const { query } = useRouter();
-  const { id } = query;
+  const { userId } = query;
 
   const updateSavingsApi = async (payload: SavingType) => {
     const origin = window.location.origin;
     try {
-      const res = await fetch(origin + `/api/users/${id}/savings`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        origin + `/api/finances/savings/?userId=${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (res.status === 200) {
         setTotalSavings(data.total_savings);

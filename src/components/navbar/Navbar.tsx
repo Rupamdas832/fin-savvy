@@ -10,7 +10,7 @@ const Navbar = ({ user_id, first_name }: NavbarProps) => {
   return (
     <div className="flex justify-between p-3 w-full h-fit sticky bg-black text-white">
       <div>
-        <Link href={`/dashboard/1`}>
+        <Link href={`/dashboard/?userId=e564317f-4101-4707-9bd3-0f06aa631166`}>
           <p className="text-base font-bold">Hello, {first_name}!</p>
         </Link>
       </div>

@@ -1,11 +1,12 @@
+import { originUrl } from "@/api/api";
 import Button from "@/components/button/Button";
 import Layout from "@/components/layout/Layout";
 import { useRouter } from "next/router";
 
-const EmergencyFund = () => {
+const Login = () => {
   const router = useRouter();
   const handleLoginClick = () => {
-    router.push("/onboarding/1");
+    router.push("/onboarding/?userId=e564317f-4101-4707-9bd3-0f06aa631166");
   };
 
   return (
@@ -25,4 +26,4 @@ const EmergencyFund = () => {
   );
 };
 
-export default EmergencyFund;
+export default Login;

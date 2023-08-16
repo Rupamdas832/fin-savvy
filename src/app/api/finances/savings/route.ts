@@ -12,8 +12,13 @@ const SavingsSchema = z.object({
   total_savings: z.number(),
 });
 
-export async function GET(request: any, { params }: any) {
-  const requiredData = finances.find((user) => user.user_id === params.id);
+export async function GET(request: any) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("userId");
+
+  if (!userId) return NextResponse.json({ error: "Please provide user id" });
+
+  const requiredData = finances.find((user) => user.user_id === userId);
   if (!requiredData) {
     return NextResponse.json({ error: "User not found" });
   }
@@ -34,13 +39,15 @@ export async function GET(request: any, { params }: any) {
   return NextResponse.json(savings);
 }
 
-export async function PUT(req: any, { params }: any) {
+export async function PUT(req: any) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
+
   const requestBody = await req.json();
+
   try {
     const validatedReq = SavingsSchema.parse(requestBody);
-    const requiredIndex = finances.findIndex(
-      (user) => user.user_id === params.id
-    );
+    const requiredIndex = finances.findIndex((user) => user.user_id === userId);
     const requiredData = finances[requiredIndex];
     if (!requiredData) {
       return NextResponse.json({ error: "User not found" });
