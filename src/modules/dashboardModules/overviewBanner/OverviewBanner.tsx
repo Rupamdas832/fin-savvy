@@ -45,7 +45,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push("/insurance-planner")}
+          onClick={() => router.push(`/insurance-planner/?userId=${user_id}`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faShieldHalved} color="bg-pink-400" />
@@ -57,7 +57,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push("/debt-diagnosis")}
+          onClick={() => router.push(`/debt-diagnosis/?userId=${user_id}`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faHandHoldingDollar} color="bg-cyan-400" />
@@ -69,7 +69,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push("/tax-saving")}
+          onClick={() => router.push(`/tax-saving/?userId=${user_id}`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faBuildingColumns} color="bg-amber-400" />

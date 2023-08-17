@@ -15,9 +15,8 @@ import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "@/components/modal/Modal";
 import { useRouter } from "next/router";
-import { originUrl } from "@/api/api";
+import { axiosInstance } from "@/api/api";
 import { ExpenseType } from "@/types/expenses.type";
-import { UserType } from "@/types/user.type";
 
 const expenseCategory = [
   {
@@ -66,30 +65,27 @@ export async function getServerSideProps(context: any) {
   const { query } = context;
   const { userId } = query;
   let expensesData = [];
-  let usersData = {};
+
   try {
-    const res = await fetch(originUrl + `/api/expenses/?userId=${userId}`);
-    expensesData = await res.json();
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const res = await fetch(originUrl + `/api/users/?userId=${userId}`);
-    usersData = await res.json();
+    const { data, status } = await axiosInstance.get(
+      `/api/expenses/?userId=${userId}`
+    );
+    if (status === 200) {
+      expensesData = data;
+    }
   } catch (error) {
     console.log(error);
   }
   return {
-    props: { expenses: expensesData, user: usersData },
+    props: { expenses: expensesData },
   };
 }
 
 interface ExpensesProps {
   expenses: ExpenseType[];
-  user: UserType;
 }
 
-const Expenses = ({ expenses, user }: ExpensesProps) => {
+const Expenses = ({ expenses }: ExpensesProps) => {
   const [title, setTitle] = useState("");
   const [expenseCategoryId, setExpenseCategoryId] = useState("");
   const [amount, setAmount] = useState(0);
@@ -99,6 +95,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const router = useRouter();
   const { query } = router;
   const { userId } = query;
+  console.log("userId", userId);
 
   const postNewExpense = async (payload: ExpenseType) => {
     const origin = window.location.origin;
@@ -121,7 +118,7 @@ const Expenses = ({ expenses, user }: ExpensesProps) => {
   const handleAddClick = () => {
     if (title && expenseCategoryId && amount) {
       const newExpense: ExpenseType = {
-        user_id: user.user_id,
+        user_id: userId as string,
         expense_id: `${expenseList.length + 1}`,
         description: title,
         expense_category_id: expenseCategoryId,

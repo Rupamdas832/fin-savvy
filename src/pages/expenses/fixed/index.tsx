@@ -10,7 +10,7 @@ import ProgressCard from "@/components/progressCard/ProgressCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FixedExpenseType } from "@/types/finance.type";
 import { useRouter } from "next/router";
-import { originUrl } from "@/api/api";
+import { axiosInstance, originUrl } from "@/api/api";
 
 const tipsListEmergencyFund = [
   {
@@ -28,10 +28,12 @@ export async function getServerSideProps(context: any) {
   const { userId } = query;
   let expensesData = {};
   try {
-    const res = await fetch(
-      originUrl + `/api/finances/fixed-expenses/?userId=${userId}`
+    const { data, status } = await axiosInstance.get(
+      `/api/finances/fixed-expenses/?userId=${userId}`
     );
-    expensesData = await res.json();
+    if (status === 200) {
+      expensesData = data;
+    }
   } catch (error) {
     console.log(error);
   }

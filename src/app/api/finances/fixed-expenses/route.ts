@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import finances from "@/app/data/finances";
-import { FinanceType, SavingType } from "@/types/finance.type";
+import { FinanceType } from "@/types/finance.type";
 import { calculateEmergencyFund } from "@/utils/businessLogics";
 import { z } from "zod";
 import { generalErrorHandling } from "@/app/utils/error";

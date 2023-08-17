@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import LogoBadge from "@/components/badge/LogoBadge";
-import { originUrl } from "@/api/api";
+import { axiosInstance } from "@/api/api";
 import { useRouter } from "next/router";
 
 const tipsListEmergencyFund = [
@@ -26,17 +26,19 @@ const tipsListEmergencyFund = [
 export async function getServerSideProps(context: any) {
   const { query } = context;
   const { userId } = query;
-  let data = {};
+  let emergencyFund = {};
   try {
-    const res = await fetch(
-      originUrl + `/api/finances/emergency-fund/?userId=${userId}`
+    const { data, status } = await axiosInstance(
+      `/api/finances/emergency-fund/?userId=${userId}`
     );
-    data = await res.json();
+    if (status === 200) {
+      emergencyFund = data;
+    }
   } catch (error) {
     console.log(error);
   }
   return {
-    props: { emergencyFundData: data },
+    props: { emergencyFundData: emergencyFund },
   };
 }
 

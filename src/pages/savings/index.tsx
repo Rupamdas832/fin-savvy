@@ -7,8 +7,7 @@ import { useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import { SavingType } from "@/types/finance.type";
 import { useRouter } from "next/router";
-import { UserType } from "@/types/user.type";
-import { originUrl } from "@/api/api";
+import { axiosInstance } from "@/api/api";
 
 const tipsListEmergencyFund = [
   {
@@ -25,32 +24,27 @@ export async function getServerSideProps(context: any) {
   const { query } = context;
   const { userId } = query;
   let savingsData = {};
-  let usersData = {};
+
   try {
-    const res = await fetch(
-      originUrl + `/api/finances/savings/?userId=${userId}`
+    const { data, status } = await axiosInstance.get(
+      `/api/finances/savings/?userId=${userId}`
     );
-    savingsData = await res.json();
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const res = await fetch(originUrl + `/api/users/?userId=${userId}`);
-    usersData = await res.json();
+    if (status === 200) {
+      savingsData = data;
+    }
   } catch (error) {
     console.log(error);
   }
   return {
-    props: { savings: savingsData, user: usersData },
+    props: { savings: savingsData },
   };
 }
 
 interface SavingsProps {
   savings: SavingType;
-  user: UserType;
 }
 
-const Savings = ({ savings, user }: SavingsProps) => {
+const Savings = ({ savings }: SavingsProps) => {
   const [bankBalance, setBankBalance] = useState(savings.bank_balance);
   const [fdBalance, setFDBalance] = useState(savings.fd_balance);
   const [equityBalance, setEquityBalance] = useState(savings.equity_balance);
@@ -94,7 +88,7 @@ const Savings = ({ savings, user }: SavingsProps) => {
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar user_id={user.user_id} first_name={user.first_name} />
+        <Navbar />
         <div className="flex flex-col p-4">
           <div className="flex items-center">
             <p className="text-2xl font-bold mr-2">Total Savings</p>
