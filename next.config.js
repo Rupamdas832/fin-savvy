@@ -12,7 +12,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/about",
+        source: "/(.*)",
         headers: [
           {
             key: "X-Frame-Options",
