@@ -63,12 +63,14 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
   const [emergencyFund, setEmergencyFund] = useState(
     emergencyFundData?.emergency_fund
   );
+  const [isLoading, setIsLoading] = useState(false);
   const { query } = useRouter();
   const { userId } = query;
 
   const updateEmergencyApi = async (payload: any) => {
     const origin = window.location.origin;
     try {
+      setIsLoading(true);
       const res = await fetch(
         origin + `/api/finances/emergency-fund/?userId=${userId}`,
         {
@@ -80,6 +82,8 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
       setEmergencyFund(data.emergency_fund);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -159,7 +163,12 @@ const EmergencyFund = ({ emergencyFundData }: EmergencyFundProps) => {
             </select>
           </div>
           <div className="mt-4">
-            <Button text="Calculate" onClick={handleCalculateClick} />
+            <Button
+              text="Calculate"
+              onClick={handleCalculateClick}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            />
           </div>
           {emergencyFund !== 0 && (
             <div className="mt-4">

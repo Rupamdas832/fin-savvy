@@ -73,12 +73,14 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
   const [totalExpenses, setTotalExpenses] = useState(
     fixed_expenses?.total_fixed_expenses
   );
+  const [isLoading, setIsLoading] = useState(false);
   const { query } = useRouter();
   const { userId } = query;
 
   const updateExpenseApi = async (payload: IFixedExpense) => {
     const origin = window.location.origin;
     try {
+      setIsLoading(true);
       const res = await fetch(
         origin + `/api/finances/fixed-expenses/?userId=${userId}`,
         {
@@ -92,6 +94,8 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -268,7 +272,12 @@ const FixedExpenses = ({ fixed_expenses }: FixedExpensesProps) => {
             />
           </div>
           <div className="mt-4">
-            <Button text="Calculate" onClick={handleCalculateClick} />
+            <Button
+              text="Calculate"
+              onClick={handleCalculateClick}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            />
           </div>
           {totalExpenses > 0 && (
             <div className="mt-4">

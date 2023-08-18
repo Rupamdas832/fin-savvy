@@ -51,11 +51,13 @@ const Savings = ({ savings }: SavingsProps) => {
   const [goldBalance, setGoldBalance] = useState(savings.gold_balance);
   const [totalSavings, setTotalSavings] = useState(savings.total_savings);
   const { query } = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const { userId } = query;
 
   const updateSavingsApi = async (payload: SavingType) => {
     const origin = window.location.origin;
     try {
+      setIsLoading(true);
       const res = await fetch(
         origin + `/api/finances/savings/?userId=${userId}`,
         {
@@ -69,6 +71,8 @@ const Savings = ({ savings }: SavingsProps) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,7 +154,12 @@ const Savings = ({ savings }: SavingsProps) => {
             />
           </div>
           <div className="mt-4">
-            <Button text="Save" onClick={handleCalculateClick} />
+            <Button
+              text="Save"
+              onClick={handleCalculateClick}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            />
           </div>
           <TipsCard list={tipsListEmergencyFund} />
         </div>
