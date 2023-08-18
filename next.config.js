@@ -32,7 +32,7 @@ const nextConfig = {
           },
           {
             key: "Access-Control-Allow-Origin",
-            value: "*",
+            value: "https://fin-savvy.vercel.app",
           },
           {
             key: "Access-Control-Allow-Methods",
