@@ -95,11 +95,10 @@ const Expenses = ({ expenses }: ExpensesProps) => {
   const router = useRouter();
   const { query } = router;
   const { userId } = query;
-  const [isLoading, setIsLoading] = useState(false);
+  console.log("userId", userId);
 
   const postNewExpense = async (payload: ExpenseType) => {
     const origin = window.location.origin;
-    setIsLoading(true);
     try {
       const res = await fetch(origin + `/api/expenses`, {
         method: "POST",
@@ -113,7 +112,6 @@ const Expenses = ({ expenses }: ExpensesProps) => {
       console.log(error);
     } finally {
       handleResetModal();
-      setIsLoading(false);
     }
   };
 
@@ -260,13 +258,7 @@ const Expenses = ({ expenses }: ExpensesProps) => {
                   />
                 </div>
                 <div className="mt-4">
-                  <Button
-                    text="Add"
-                    onClick={() => handleAddClick()}
-                    isLoading={isLoading}
-                    loadingText="Adding"
-                    isDisabled={isLoading}
-                  />
+                  <Button text="Add" onClick={() => handleAddClick()} />
                 </div>
               </div>
             </Modal>
