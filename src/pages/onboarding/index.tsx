@@ -34,10 +34,7 @@ const Onboarding = ({ finance }: OnboardingProps) => {
     push(`/expenses/fixed/?userId=${userId}`);
   };
 
-  if (
-    finance?.savings?.total_savings &&
-    finance?.fixed_expenses?.total_fixed_expenses
-  ) {
+  if (finance?.total_savings && finance?.total_fixed_expenses) {
     push(`/dashboard/?userId=${userId}`);
   }
 
@@ -51,11 +48,11 @@ const Onboarding = ({ finance }: OnboardingProps) => {
           Do you think you are financialy stable? Let's find out.
         </p>
         <div className="mt-8 flex flex-col">
-          {!finance?.savings?.total_savings && (
+          {!finance?.total_savings && (
             <Button text="Savings" onClick={handleSavingsClick} theme="LIGHT" />
           )}
           <div className="mt-4">
-            {!finance?.fixed_expenses?.total_fixed_expenses && (
+            {!finance?.total_fixed_expenses && (
               <Button
                 text="Fixed expenses"
                 onClick={handleExpensesClick}

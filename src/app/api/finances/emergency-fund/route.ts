@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import finances from "@/app/data/finances";
-import { FinanceType } from "@/types/finance.type";
 import { calculateEmergencyFund } from "@/utils/businessLogics";
 import { z } from "zod";
-import { generalErrorHandling } from "@/app/utils/error";
 import { prisma } from "@/app/db/db";
+import { Prisma } from "@prisma/client";
 
 const EmergencyFundSchema = z.object({
   monthly_income: z.number(),
@@ -16,23 +14,44 @@ export async function GET(request: any) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  const requiredData = finances.find((user) => user.user_id === userId);
-  if (!requiredData) {
-    return NextResponse.json({ error: "User not found" });
+  try {
+    if (userId) {
+      const requiredData = await prisma.finance.findFirst({
+        where: {
+          user_id: {
+            equals: userId,
+          },
+        },
+      });
+      if (!requiredData) return NextResponse.json({ error: "User not found" });
+
+      let emergency_fund = {
+        emergency_fund: requiredData?.emergency_fund,
+        monthly_income: requiredData?.monthly_income,
+        job_stability: requiredData?.job_stability,
+        savings: requiredData?.bank_balance + requiredData?.fd_balance,
+        total_fixed_expenses: requiredData?.total_fixed_expenses,
+      };
+
+      return NextResponse.json(emergency_fund);
+    } else {
+      return NextResponse.json(
+        { message: "Please provide user id" },
+        { status: 400 }
+      );
+    }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
-
-  let emergency_fund = {
-    emergency_fund: requiredData.emergency_fund ?? 0,
-    monthly_income: requiredData.monthly_income ?? 0,
-    job_stability: requiredData.job_stability ?? 3,
-    savings:
-      requiredData?.savings?.bank_balance + requiredData?.savings?.fd_balance ??
-      0,
-    total_fixed_expenses:
-      requiredData?.fixed_expenses?.total_fixed_expenses ?? 0,
-  };
-
-  return NextResponse.json(emergency_fund);
 }
 
 export async function PUT(req: any) {
@@ -42,35 +61,50 @@ export async function PUT(req: any) {
 
   try {
     const validatedReq = EmergencyFundSchema.parse(requestBody);
-    const requiredIndex = finances.findIndex((user) => user.user_id === userId);
-    const requiredData = finances[requiredIndex];
-    if (!requiredData && userId) {
-      const requiredUser = await prisma.user.findFirst({
+    if (userId) {
+      const requiredData = await prisma.finance.findFirst({
         where: {
-          user_id: { equals: userId },
+          user_id: {
+            equals: userId,
+          },
         },
       });
+      if (!requiredData) return NextResponse.json({ error: "User not found" });
 
-      if (!requiredUser) return NextResponse.json({ error: "User not found" });
+      const requiredFund = calculateEmergencyFund({
+        total_fixed_expenses: validatedReq?.total_fixed_expenses,
+        monthly_income: validatedReq?.monthly_income,
+        job_stability: validatedReq?.job_stability,
+      });
+
+      const updatedData = {
+        ...requiredData,
+        emergency_fund: requiredFund,
+        monthly_income: validatedReq?.monthly_income,
+        job_stability: validatedReq?.job_stability,
+      };
+
+      const response = await prisma.finance.update({
+        where: { user_id: userId },
+        data: updatedData,
+      });
+
+      return NextResponse.json({ emergency_fund: requiredFund });
     }
-
-    const requiredFund = calculateEmergencyFund({
-      total_fixed_expenses: validatedReq?.total_fixed_expenses,
-      monthly_income: validatedReq?.monthly_income,
-      job_stability: validatedReq?.job_stability,
-    });
-
-    const updatedData: FinanceType = {
-      ...requiredData,
-      emergency_fund: requiredFund,
-      monthly_income: validatedReq?.monthly_income,
-      job_stability: validatedReq?.job_stability,
-    };
-    finances[requiredIndex] = updatedData;
-
-    return NextResponse.json({ emergency_fund: requiredFund });
-  } catch (err) {
-    console.log(err);
-    return generalErrorHandling(err, NextResponse);
+    return NextResponse.json(
+      { message: "Please provide user id" },
+      { status: 400 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

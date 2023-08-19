@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 const Login = () => {
   const router = useRouter();
   const handleLoginClick = () => {
-    router.push("/onboarding/?userId=e564317f-4101-4707-9bd3-0f06aa631166");
+    router.push("/onboarding/?userId=9ef5267c-85ed-44d5-9cd2-8b3e5b4a1026");
   };
 
   return (

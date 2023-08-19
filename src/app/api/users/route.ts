@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../db/db";
 import { z } from "zod";
-import { generalErrorHandling } from "@/app/utils/error";
+import { Prisma } from "@prisma/client";
 
 const UserSchema = z.object({
   first_name: z.string(),
@@ -36,9 +36,53 @@ export async function POST(req: any) {
     const newUser = await prisma.user.create({
       data: validatedReq,
     });
-    return NextResponse.json(newUser);
+    const newFinance = await prisma.finance.create({
+      data: {
+        user_id: newUser.user_id,
+      },
+    });
+    return NextResponse.json({ userData: newUser, userFinance: newFinance });
   } catch (error) {
-    console.log(error);
-    return generalErrorHandling(error, NextResponse);
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: any) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("userId");
+
+  try {
+    if (userId) {
+      const res = await prisma.user.delete({
+        where: {
+          user_id: userId,
+        },
+      });
+      return NextResponse.json({ message: "User data successfully deleted" });
+    }
+    return NextResponse.json(
+      { message: "Please provide user id" },
+      { status: 400 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

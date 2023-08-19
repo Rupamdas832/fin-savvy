@@ -1,35 +1,51 @@
 import { NextResponse } from "next/server";
-import expenses from "@/app/data/expenses";
-import { ExpenseType } from "@/types/expenses.type";
 import { z } from "zod";
-import { generalErrorHandling } from "@/app/utils/error";
 import { prisma } from "@/app/db/db";
+import { Prisma } from "@prisma/client";
 
 const ExpenseSchema = z.object({
   user_id: z.string(),
-  expense_id: z.string(),
   description: z.string(),
   expense_category_id: z.string(),
   amount: z.number(),
-  created_at: z.string(),
+  expense_date: z.string(),
 });
 
 export async function GET(request: any) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  const requiredData = expenses.filter((user) => user.user_id === userId);
-  if (!requiredData && userId) {
-    const requiredUser = await prisma.user.findFirst({
-      where: {
-        user_id: { equals: userId },
-      },
-    });
+  try {
+    if (userId) {
+      const requiredData = await prisma.expenses.findMany({
+        where: {
+          user_id: { equals: userId },
+        },
+      });
 
-    if (!requiredUser) return NextResponse.json({ error: "User not found" });
+      if (!requiredData)
+        return NextResponse.json(
+          { error: "Expenses not found" },
+          { status: 404 }
+        );
+
+      return NextResponse.json(requiredData);
+    } else {
+      const expenses = await prisma.expenses.findMany();
+      return NextResponse.json(expenses);
+    }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(requiredData);
 }
 
 export async function POST(req: any) {
@@ -46,15 +62,25 @@ export async function POST(req: any) {
     if (!requiredUser)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const updatedData: ExpenseType = {
+    const payload = {
       ...validatedReq,
-      expense_id: String(expenses.length + 1),
+      expense_date: new Date(validatedReq.expense_date),
     };
-    expenses.push(updatedData);
 
-    return NextResponse.json(updatedData);
-  } catch (err) {
-    console.log(err);
-    return generalErrorHandling(err, NextResponse);
+    const newExpense = await prisma.expenses.create({
+      data: payload,
+    });
+    return NextResponse.json(newExpense);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

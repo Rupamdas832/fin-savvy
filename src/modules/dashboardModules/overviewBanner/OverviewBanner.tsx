@@ -1,5 +1,4 @@
 import LogoBadge from "@/components/badge/LogoBadge";
-import Link from "next/link";
 import {
   faBuildingColumns,
   faHandHoldingDollar,
@@ -19,7 +18,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
 
   const getPercentage = () => {
     const p =
-      ((finance?.savings?.bank_balance + finance?.savings?.fd_balance) /
+      ((finance?.bank_balance + finance?.fd_balance) /
         finance?.emergency_fund) *
       100;
     return p.toFixed();

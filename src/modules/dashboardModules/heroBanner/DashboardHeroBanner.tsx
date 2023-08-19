@@ -37,9 +37,7 @@ const DashboardHeroBanner = ({
         />
         <div className="flex flex-col ml-4">
           <p className="text-sm">Total Savings</p>
-          <p className="text-base font-bold">
-            ₹ {finance?.savings?.total_savings ?? 0}
-          </p>
+          <p className="text-base font-bold">₹ {finance?.total_savings}</p>
         </div>
       </div>
       <div className="flex justify-between gap-4 mt-4">
@@ -50,9 +48,7 @@ const DashboardHeroBanner = ({
           />
           <div className="flex flex-col ml-4">
             <p className="text-sm">Income</p>
-            <p className="text-base font-bold">
-              ₹ {finance?.monthly_income ?? 0}
-            </p>
+            <p className="text-base font-bold">₹ {finance?.monthly_income}</p>
           </div>
         </div>
         <div
@@ -66,9 +62,7 @@ const DashboardHeroBanner = ({
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
-              ₹{" "}
-              {finance?.fixed_expenses?.total_fixed_expenses +
-                totalCurrentExpenses ?? 0}
+              ₹ {finance?.total_fixed_expenses + totalCurrentExpenses}
             </p>
           </div>
         </div>

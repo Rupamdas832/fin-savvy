@@ -121,11 +121,10 @@ const Expenses = ({ expenses }: ExpensesProps) => {
     if (title && expenseCategoryId && amount) {
       const newExpense: ExpenseType = {
         user_id: userId as string,
-        expense_id: `${expenseList.length + 1}`,
         description: title,
         expense_category_id: expenseCategoryId,
         amount,
-        created_at: createdAt,
+        expense_date: createdAt,
       };
       postNewExpense(newExpense);
     }
@@ -201,7 +200,7 @@ const Expenses = ({ expenses }: ExpensesProps) => {
                   <div className="flex flex-col items-end">
                     <p className="text-sm font-bold">₹ {expense.amount}</p>
                     <p className="text-sm">
-                      {dayjs(expense.created_at).format("DD-MMM-YYYY")}
+                      {dayjs(expense.expense_date).format("DD-MMM-YYYY")}
                     </p>
                   </div>
                 </div>

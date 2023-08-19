@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import finances from "@/app/data/finances";
-import { FinanceType, SavingType } from "@/types/finance.type";
+import { SavingType } from "@/types/finance.type";
 import { z } from "zod";
-import { generalErrorHandling } from "@/app/utils/error";
+import { prisma } from "@/app/db/db";
+import { Prisma } from "@prisma/client";
 
 const SavingsSchema = z.object({
   bank_balance: z.number(),
@@ -16,27 +16,43 @@ export async function GET(request: any) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  if (!userId) return NextResponse.json({ error: "Please provide user id" });
+  try {
+    if (userId) {
+      const requiredData = await prisma.finance.findFirst({
+        where: {
+          user_id: {
+            equals: userId,
+          },
+        },
+      });
+      if (!requiredData)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const requiredData = finances.find((user) => user.user_id === userId);
-  if (!requiredData) {
-    return NextResponse.json({ error: "User not found" });
+      let savings: SavingType = {
+        bank_balance: requiredData.bank_balance,
+        fd_balance: requiredData.fd_balance,
+        equity_balance: requiredData.equity_balance,
+        gold_balance: requiredData.gold_balance,
+        total_savings: requiredData.total_savings,
+      };
+      return NextResponse.json(savings);
+    }
+    return NextResponse.json(
+      { message: "Please provide user id" },
+      { status: 400 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
-
-  let savings: SavingType = {
-    bank_balance: 0,
-    fd_balance: 0,
-    equity_balance: 0,
-    gold_balance: 0,
-    total_savings: 0,
-  };
-  if (requiredData?.savings) {
-    savings = {
-      ...requiredData?.savings,
-    };
-  }
-
-  return NextResponse.json(savings);
 }
 
 export async function PUT(req: any) {
@@ -47,20 +63,45 @@ export async function PUT(req: any) {
 
   try {
     const validatedReq = SavingsSchema.parse(requestBody);
-    const requiredIndex = finances.findIndex((user) => user.user_id === userId);
-    const requiredData = finances[requiredIndex];
-    if (!requiredData) {
-      return NextResponse.json({ error: "User not found" });
-    }
-    const updatedData: FinanceType = {
-      ...requiredData,
-      savings: validatedReq,
-    };
-    finances[requiredIndex] = updatedData;
 
-    return NextResponse.json(updatedData.savings);
-  } catch (err) {
-    console.log(err);
-    return generalErrorHandling(err, NextResponse);
+    if (userId) {
+      const requiredData = await prisma.finance.findFirst({
+        where: {
+          user_id: {
+            equals: userId,
+          },
+        },
+      });
+      if (!requiredData)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+      const updatedData = {
+        ...requiredData,
+        ...validatedReq,
+      };
+      const res = await prisma.finance.update({
+        where: {
+          user_id: userId,
+        },
+        data: updatedData,
+      });
+
+      return NextResponse.json({ total_savings: res.total_savings });
+    }
+    return NextResponse.json(
+      { message: "Please provide user id" },
+      { status: 400 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

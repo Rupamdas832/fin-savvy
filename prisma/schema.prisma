@@ -17,23 +17,62 @@ model User {
   last_name String
   email String @unique
   created_at DateTime @default(now())
+  finance Finance?
+  expense Expenses[]
 }
 
-// model Finance {
-//   user_finance_id String @id @default(uuid())
-//   user_id String @unique
-//   user User @relation(fields: [user_id], references: [user_id])
-//   fixed_expenses FixedExpenseType
-// }
+model Finance {
+  user_finance_id String @id @default(uuid())
+  user_id String @unique
+  user User @relation(fields: [user_id], references: [user_id])
+  house_rent Int @default(0)
+  electricity_bill Int @default(0)
+  utility_bill Int @default(0)
+  food_bill Int @default(0)
+  commute_bill Int @default(0)
+  ott_bill Int @default(0)
+  parent_donation Int @default(0)
+  other_bill Int @default(0)
+  total_fixed_expenses Int @default(0)
+  bank_balance Int @default(0)
+  fd_balance Int @default(0)
+  equity_balance Int @default(0)
+  gold_balance Int @default(0)
+  total_savings Int @default(0)
+  life_insurance_cover Int @default(0)
+  critical_illness_cover Int @default(0)
+  accidental_death_cover Int @default(0)
+  health_insurance_cover Int @default(0)
+  required__life_insurance_cover Int @default(0)
+  required_critical_illness_cover Int @default(0)
+  required_accidental_death_cover Int @default(0)
+  required_health_insurance_cover Int @default(0)
+  total_emi Int @default(0)
+  total_loan_amount Int @default(0)
+  emi_load Int @default(0)
+  emergency_fund Int @default(0)
+  monthly_income Int @default(0)
+  job_stability Int @default(3)
+  monthly_epf Int @default(0)
+  life_insurance_premium Int @default(0)
+  elss_investment Int @default(0)
+  health_insurance_premium Int @default(0)
+  parents_health_insurance_premium Int @default(0)
+  is_user_age_above_sixty Boolean @default(false)
+  is_parents_age_above_sixty Boolean @default(false)
+  nps_investment Int @default(0)
+  required_80C_investment Int @default(150000)
+  required_80D_investment Int @default(0)
+  required_80CCD_investment Int @default(50000)
+}
 
-// type FixedExpenseType {
-//   house_rent Int @default(0)
-//   electricity_bill Int @default(0)
-//   utility_bill Int @default(0)
-//   food_bill Int @default(0)
-//   commute_bill Int @default(0)
-//   ott_bill Int @default(0)
-//   parent_donation Int @default(0)
-//   other_bill Int @default(0)
-//   total_fixed_expenses Int @default(0)
-// }
+model Expenses {
+  expense_id String @id @default(uuid())
+  user_id String @unique
+  user User @relation(fields: [user_id], references: [user_id])
+  description String
+  expense_category_id String
+  amount Int @default(0)
+  expense_date DateTime
+  created_at DateTime @default(now())
+}
