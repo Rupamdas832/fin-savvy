@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import {
   faBuildingColumns,
@@ -23,6 +24,39 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
       100;
     return p.toFixed();
   };
+
+  const getInsuranceScore = useMemo(() => {
+    let life = 0;
+    let health = 0;
+    let critical = 0;
+    let accident = 0;
+
+    if (finance?.required__life_insurance_cover) {
+      life = Math.floor(
+        finance?.life_insurance_cover / finance?.required__life_insurance_cover
+      );
+    }
+    if (finance?.required_accidental_death_cover) {
+      accident = Math.floor(
+        finance?.accidental_death_cover /
+          finance?.required_accidental_death_cover
+      );
+    }
+    if (finance?.required_critical_illness_cover) {
+      critical = Math.floor(
+        finance?.critical_illness_cover /
+          finance?.required_critical_illness_cover
+      );
+    }
+    if (finance?.required_health_insurance_cover) {
+      health = Math.floor(
+        finance?.health_insurance_cover /
+          finance?.required_health_insurance_cover
+      );
+    }
+    const score = life + health + critical + accident;
+    return score;
+  }, [finance]);
 
   return (
     <div className="flex flex-col p-4 bg-white rounded-t-2xl text-black">
@@ -51,7 +85,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
             <p className="text-sm">Insurance Planner</p>
           </div>
           <div>
-            <p className="text-sm font-bold">50%</p>
+            <p className="text-sm font-bold">{getInsuranceScore}/4</p>
           </div>
         </div>
         <div

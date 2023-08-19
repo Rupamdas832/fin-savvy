@@ -27,6 +27,8 @@ export type InsuranceType = {
   required_critical_illness_cover: number;
   required_accidental_death_cover: number;
   required_health_insurance_cover: number;
+  monthly_income: number;
+  total_loan_amount: number;
 };
 
 export type DebtType = {

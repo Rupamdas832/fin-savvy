@@ -3,12 +3,14 @@ import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
-import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
 import { faHandPointDown } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { axiosInstance } from "@/api/api";
+import { InsuranceType } from "@/types/finance.type";
+import { useRouter } from "next/router";
 
 const tipsListEmergencyFund = [
   {
@@ -33,29 +35,99 @@ const tipsListEmergencyFund = [
   },
 ];
 
-const InsurancePlanner = () => {
-  const [annualIncome, setAnnualIncome] = useState(0);
-  const [lifeCover, setLifeCover] = useState(0);
-  const [criticalIllnessCover, setCriticalIllnessCover] = useState(0);
-  const [accidentalCover, setAccidentalCover] = useState(0);
-  const [loanAmount, setLoanAmount] = useState(0);
-  const [healthCover, setHealthCover] = useState(0);
-  const [requiredLifeCover, setRequiredLifeCover] = useState(0);
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { userId } = query;
+  let insuranceData = {};
+  try {
+    const { data, status } = await axiosInstance.get(
+      `/api/finances/insurance-planner/?userId=${userId}`
+    );
+    if (status === 200) {
+      insuranceData = data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { insuranceData: insuranceData },
+  };
+}
+
+interface IInsurance {
+  insuranceData: InsuranceType;
+}
+
+const InsurancePlanner = ({ insuranceData }: IInsurance) => {
+  const [annualIncome, setAnnualIncome] = useState(
+    insuranceData?.monthly_income * 12
+  );
+  const [lifeCover, setLifeCover] = useState(
+    insuranceData.life_insurance_cover
+  );
+  const [criticalIllnessCover, setCriticalIllnessCover] = useState(
+    insuranceData.critical_illness_cover
+  );
+  const [accidentalCover, setAccidentalCover] = useState(
+    insuranceData.accidental_death_cover
+  );
+  const [loanAmount, setLoanAmount] = useState(insuranceData.total_loan_amount);
+  const [healthCover, setHealthCover] = useState(
+    insuranceData.health_insurance_cover
+  );
+  const [requiredLifeCover, setRequiredLifeCover] = useState(
+    insuranceData.required__life_insurance_cover
+  );
   const [requiredCriticalIllnessCover, setRequiredCriticalIllnessCover] =
-    useState(0);
-  const [requiredAccidentalCover, setRequiredAccidentalCover] = useState(0);
-  const [requiredHealthCover, setRequiredHealthCover] = useState(0);
+    useState(insuranceData.required_critical_illness_cover);
+  const [requiredAccidentalCover, setRequiredAccidentalCover] = useState(
+    insuranceData.required_accidental_death_cover
+  );
+  const [requiredHealthCover, setRequiredHealthCover] = useState(
+    insuranceData.required_health_insurance_cover
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { query } = useRouter();
+  const { userId } = query;
+
+  const updateInsuranceApi = async (payload: any) => {
+    const origin = window.location.origin;
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        origin + `/api/finances/insurance-planner/?userId=${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await res.json();
+      if (res.status === 200) {
+        setRequiredLifeCover(data.required__life_insurance_cover);
+        setRequiredHealthCover(data.required_health_insurance_cover);
+        setRequiredCriticalIllnessCover(data.required_critical_illness_cover);
+        setRequiredAccidentalCover(data.required_accidental_death_cover);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCalculateClick = () => {
     if (!annualIncome) return;
-    const life = annualIncome * 10 + loanAmount;
-    setRequiredLifeCover(life);
-    const health = 500000;
-    setRequiredHealthCover(health);
-    const critical = 3000000;
-    setRequiredCriticalIllnessCover(critical);
-    const accidental = annualIncome * 10;
-    setRequiredAccidentalCover(accidental);
+
+    const payload = {
+      life_insurance_cover: lifeCover,
+      critical_illness_cover: criticalIllnessCover,
+      accidental_death_cover: accidentalCover,
+      health_insurance_cover: healthCover,
+      total_loan_amount: loanAmount,
+      monthly_income: annualIncome / 12,
+    };
+    updateInsuranceApi(payload);
   };
 
   return (
@@ -80,6 +152,7 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setAnnualIncome(Number(e.target.value))}
+              value={annualIncome?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -91,6 +164,7 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setLifeCover(Number(e.target.value))}
+              value={lifeCover?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -103,6 +177,7 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setCriticalIllnessCover(Number(e.target.value))}
+              value={criticalIllnessCover?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -114,6 +189,7 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setAccidentalCover(Number(e.target.value))}
+              value={accidentalCover?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -126,6 +202,7 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setLoanAmount(Number(e.target.value))}
+              value={loanAmount?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -137,10 +214,16 @@ const InsurancePlanner = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setHealthCover(Number(e.target.value))}
+              value={healthCover?.toString()}
             />
           </div>
           <div className="mt-4">
-            <Button text="Save" onClick={handleCalculateClick} />
+            <Button
+              text="Save"
+              onClick={handleCalculateClick}
+              isDisabled={isLoading}
+              isLoading={isLoading}
+            />
           </div>
           {(requiredLifeCover > 0 ||
             requiredHealthCover > 0 ||
