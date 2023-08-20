@@ -2,9 +2,17 @@ import Layout from "@/components/layout/Layout";
 import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
-import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHandPointDown,
+  faSackDollar,
+} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
+import { axiosInstance } from "@/api/api";
+import { DebtType } from "@/types/finance.type";
+import { useRouter } from "next/router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ProgressCard from "@/components/progressCard/ProgressCard";
 
 const tipsListEmergencyFund = [
   {
@@ -25,14 +33,72 @@ const tipsListEmergencyFund = [
   },
 ];
 
-const DebtDiagnosis = () => {
-  const [monthlyIncome, setMontlyIncome] = useState(0);
-  const [loan, setLoan] = useState(0);
-  const [emi, setEMI] = useState(0);
-  const [totalSavings, setTotalSavings] = useState(0);
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const { userId } = query;
+  let debtData = {};
+  try {
+    const { data, status } = await axiosInstance.get(
+      `/api/finances/debt-diagnosis/?userId=${userId}`
+    );
+    if (status === 200) {
+      debtData = data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { debtData: debtData },
+  };
+}
+
+interface IDebt {
+  debtData: DebtType;
+}
+
+const DebtDiagnosis = ({ debtData }: IDebt) => {
+  const [monthlyIncome, setMontlyIncome] = useState(debtData?.monthly_income);
+  const [loan, setLoan] = useState(debtData?.total_loan_amount);
+  const [emi, setEMI] = useState(debtData?.total_emi);
+  const [totalSavings, setTotalSavings] = useState(debtData?.total_savings);
+  const [emiLoad, setEmiLoad] = useState(debtData?.emi_load);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { query } = useRouter();
+  const { userId } = query;
+
+  const updateDebtApi = async (payload: any) => {
+    const origin = window.location.origin;
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        origin + `/api/finances/debt-diagnosis/?userId=${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await res.json();
+      if (res.status === 200) {
+        setEmiLoad(data.emi_load);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCalculateClick = () => {
-    console.log("saved");
+    if (!monthlyIncome) return;
+
+    const payload = {
+      monthly_income: monthlyIncome,
+      total_emi: emi,
+      total_loan_amount: loan,
+      total_savings: totalSavings,
+    };
+    updateDebtApi(payload);
   };
 
   return (
@@ -56,6 +122,7 @@ const DebtDiagnosis = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setMontlyIncome(Number(e.target.value))}
+              value={monthlyIncome?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -68,6 +135,7 @@ const DebtDiagnosis = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setLoan(Number(e.target.value))}
+              value={loan?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -79,6 +147,7 @@ const DebtDiagnosis = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEMI(Number(e.target.value))}
+              value={emi?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -91,11 +160,39 @@ const DebtDiagnosis = () => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setTotalSavings(Number(e.target.value))}
+              value={totalSavings?.toString()}
             />
           </div>
           <div className="mt-4">
-            <Button text="Calculate" onClick={handleCalculateClick} />
+            <Button
+              text="Calculate"
+              onClick={handleCalculateClick}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            />
           </div>
+          <div className="mt-4">
+            <div className="flex">
+              <p className="text-2xl font-bold">Problem Analysis</p>
+
+              <FontAwesomeIcon
+                icon={faHandPointDown}
+                className="text-2xl ml-2 text-yellow-500"
+              />
+            </div>
+            <p className="my-2 text-base bg-cyan-100 p-2">
+              Recommended to keep your emi load below 28%
+            </p>
+            <div className="my-4">
+              <ProgressCard
+                logo={faSackDollar}
+                title="EMI load"
+                currentValue={emiLoad}
+                totalValue={100}
+              />
+            </div>
+          </div>
+
           <TipsCard list={tipsListEmergencyFund} />
         </div>
       </div>

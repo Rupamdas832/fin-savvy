@@ -10,3 +10,16 @@ export const calculateEmergencyFund = (props: CalculateEmergencyFundProps) => {
 
   return requiredFund;
 };
+
+interface CalculateDebtLoadProps {
+  monthly_income: number;
+  total_emi: number;
+  total_loan_amount: number;
+  total_savings: number;
+}
+
+export const calculateDebtLoad = (props: CalculateDebtLoadProps) => {
+  if (!props.monthly_income) return 0;
+  const load = (props.total_emi / props.monthly_income) * 100;
+  return Number(load.toFixed(0));
+};

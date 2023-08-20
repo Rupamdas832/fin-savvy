@@ -37,7 +37,9 @@ const DashboardHeroBanner = ({
         />
         <div className="flex flex-col ml-4">
           <p className="text-sm">Total Savings</p>
-          <p className="text-base font-bold">₹ {finance?.total_savings}</p>
+          <p className="text-base font-bold">
+            ₹ {finance?.total_savings.toLocaleString("en-IN")}
+          </p>
         </div>
       </div>
       <div className="flex justify-between gap-4 mt-4">
@@ -48,7 +50,9 @@ const DashboardHeroBanner = ({
           />
           <div className="flex flex-col ml-4">
             <p className="text-sm">Income</p>
-            <p className="text-base font-bold">₹ {finance?.monthly_income}</p>
+            <p className="text-base font-bold">
+              ₹ {finance?.monthly_income.toLocaleString("en-IN")}
+            </p>
           </div>
         </div>
         <div
@@ -62,7 +66,10 @@ const DashboardHeroBanner = ({
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
-              ₹ {finance?.total_fixed_expenses + totalCurrentExpenses}
+              ₹{" "}
+              {(
+                finance?.total_fixed_expenses + totalCurrentExpenses
+              ).toLocaleString("en-IN")}
             </p>
           </div>
         </div>

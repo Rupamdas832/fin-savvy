@@ -34,6 +34,9 @@ export type InsuranceType = {
 export type DebtType = {
   total_emi: number;
   total_loan_amount: number;
+  monthly_income: number;
+  total_savings: number;
+  emi_load: number;
 };
 
 export type FinanceType = {

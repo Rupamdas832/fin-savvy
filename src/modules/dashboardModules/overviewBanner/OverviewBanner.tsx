@@ -58,6 +58,22 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
     return score;
   }, [finance]);
 
+  const getDebtScore = useMemo(() => {
+    let score = 1;
+    const load = finance?.emi_load;
+    const arr = [20, 40, 60, 80, 100];
+    if (load < 20) {
+      score = 5;
+    } else if (load < 40) {
+      score = 4;
+    } else if (load < 60) {
+      score = 3;
+    } else if (load < 80) {
+      score = 2;
+    }
+    return score;
+  }, [finance]);
+
   return (
     <div className="flex flex-col p-4 bg-white rounded-t-2xl text-black">
       <p className="text-base font-bold">Statistics</p>
@@ -97,7 +113,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
             <p className="text-sm">Debt Diagnosis</p>
           </div>
           <div>
-            <p className="text-sm font-bold">2/10</p>
+            <p className="text-sm font-bold">{getDebtScore}/5</p>
           </div>
         </div>
         <div

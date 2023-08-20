@@ -8,6 +8,7 @@ import LogoBadge from "@/components/badge/LogoBadge";
 import { SavingType } from "@/types/finance.type";
 import { useRouter } from "next/router";
 import { axiosInstance } from "@/api/api";
+import { getNumberSystem } from "@/utils/general";
 
 const tipsListEmergencyFund = [
   {
@@ -100,7 +101,9 @@ const Savings = ({ savings }: SavingsProps) => {
           </div>
           <p className="text-sm  mt-2">
             Savings: ₹{" "}
-            <span className="text-base font-bold">{totalSavings}</span>
+            <span className="text-base font-bold">
+              {getNumberSystem(totalSavings)}
+            </span>
           </p>
           <div className="flex flex-col mt-4">
             <label className="font-bold">
@@ -112,7 +115,7 @@ const Savings = ({ savings }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setBankBalance(Number(e.target.value))}
-              value={bankBalance.toString()}
+              value={bankBalance?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -124,7 +127,7 @@ const Savings = ({ savings }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setFDBalance(Number(e.target.value))}
-              value={fdBalance.toString()}
+              value={fdBalance?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">
@@ -137,7 +140,7 @@ const Savings = ({ savings }: SavingsProps) => {
               className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
               type="number"
               onChange={(e) => setEquityBalance(Number(e.target.value))}
-              value={equityBalance.toString()}
+              value={equityBalance?.toString()}
             />
           </div>
           <div className="flex flex-col mt-4">

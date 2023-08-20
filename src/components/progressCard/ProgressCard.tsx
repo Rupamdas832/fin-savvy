@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import LogoBadge from "../badge/LogoBadge";
+import { getNumberSystem } from "@/utils/general";
 
 interface ProgressCardProps {
   logo: any;
@@ -37,7 +38,7 @@ const ProgressCard = ({
 
       <div className="flex flex-col items-end">
         <p className="text-sm">
-          ₹ {currentValue}\{totalValue}
+          ₹ {getNumberSystem(currentValue)}\{getNumberSystem(totalValue)}
         </p>
         <p className="text-sm font-bold">{percentage.toFixed(0)}%</p>
       </div>

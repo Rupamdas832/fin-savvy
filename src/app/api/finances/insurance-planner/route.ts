@@ -87,7 +87,9 @@ export async function PUT(req: any) {
 
       const calculatedData = {
         required__life_insurance_cover:
-          requiredData.monthly_income * 12 * 10 +
+          (requiredData.monthly_income > 0
+            ? requiredData.monthly_income * 12 * 10
+            : validatedReq.monthly_income * 12 * 10) +
           requiredData.total_loan_amount,
         required_critical_illness_cover: 3000000,
         required_accidental_death_cover: requiredData.monthly_income * 12 * 5,
