@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../db/db";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { hash } from "@/lib/hash";
 
 const UserSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.string(),
+  password: z.string().min(8),
 });
 
 export async function GET(request: any) {
@@ -33,9 +35,15 @@ export async function POST(req: any) {
 
   try {
     const validatedReq = await UserSchema.parse(requestBody);
+
+    const passwordHash = await hash(validatedReq.password);
     const newUser = await prisma.user.create({
-      data: validatedReq,
+      data: {
+        ...validatedReq,
+        password: passwordHash,
+      },
     });
+
     const newFinance = await prisma.finance.create({
       data: {
         user_id: newUser.user_id,
