@@ -30,7 +30,7 @@ export async function middleware(req: any) {
   if (publicRoutes.includes(requestedPathname) && isAuth === true) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   } else if (!publicRoutes.includes(requestedPathname) && isAuth === false) {
-    return NextResponse.redirect(new URL(requestedPathname, req.url));
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 
