@@ -1,12 +1,10 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import { SavingType } from "@/types/finance.type";
-import { useRouter } from "next/router";
 import { axiosInstance } from "@/api/api";
 import { getNumberSystem } from "@/utils/general";
 
@@ -22,28 +20,29 @@ const tipsListEmergencyFund = [
 ];
 
 const Savings = () => {
-  const [savings, setSavings] = useState<SavingType | null>(null);
-  const [bankBalance, setBankBalance] = useState(savings?.bank_balance ?? 0);
-  const [fdBalance, setFDBalance] = useState(savings?.fd_balance ?? 0);
-  const [equityBalance, setEquityBalance] = useState(
-    savings?.equity_balance ?? 0
-  );
-  const [goldBalance, setGoldBalance] = useState(savings?.gold_balance ?? 0);
-  const [totalSavings, setTotalSavings] = useState(savings?.total_savings ?? 0);
-  const { query } = useRouter();
+  const [bankBalance, setBankBalance] = useState(0);
+  const [fdBalance, setFDBalance] = useState(0);
+  const [equityBalance, setEquityBalance] = useState(0);
+  const [goldBalance, setGoldBalance] = useState(0);
+  const [totalSavings, setTotalSavings] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { userId } = query;
+  const [isError, setIsError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const { data, status } = await axiosInstance.get("/api/finances/savings");
       if (status === 200) {
-        setSavings(data);
+        setBankBalance(data?.bank_balance);
+        setFDBalance(data?.fd_balance);
+        setEquityBalance(data?.equity_balance);
+        setGoldBalance(data?.gold_balance);
+        setTotalSavings(data?.total_savings);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error?.message);
     } finally {
       setIsLoading(false);
     }
@@ -54,18 +53,15 @@ const Savings = () => {
   }, []);
 
   const updateSavingsApi = async (payload: SavingType) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(
-        origin + `/api/finances/savings/?userId=${userId}`,
+      const { data, status } = await axiosInstance.put(
+        "/api/finances/savings",
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          ...payload,
         }
       );
-      const data = await res.json();
-      if (res.status === 200) {
+      if (status === 200) {
         setTotalSavings(data.total_savings);
       }
     } catch (error) {
@@ -79,7 +75,6 @@ const Savings = () => {
     const total_savings = bankBalance + fdBalance + equityBalance + goldBalance;
 
     const newSavings: SavingType = {
-      ...savings,
       bank_balance: bankBalance,
       fd_balance: fdBalance,
       equity_balance: equityBalance,

@@ -77,59 +77,67 @@ export async function GET(request: any) {
 }
 
 export async function PUT(req: any) {
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
   const requestBody = await req.json();
 
   try {
     const validatedReq = FixedExpenseSchema.parse(requestBody);
-    if (userId) {
-      const requiredData = await prisma.finance.findFirst({
-        where: {
-          user_id: {
-            equals: userId,
-          },
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-      const requiredFund = calculateEmergencyFund({
-        total_fixed_expenses: validatedReq?.total_fixed_expenses,
-        monthly_income: validatedReq?.monthly_income,
-        job_stability: requiredData?.job_stability,
-      });
-
-      const updatedData = {
-        ...requiredData,
-        house_rent: validatedReq?.house_rent,
-        electricity_bill: validatedReq?.electricity_bill,
-        utility_bill: validatedReq?.utility_bill,
-        food_bill: validatedReq?.food_bill,
-        commute_bill: validatedReq?.commute_bill,
-        ott_bill: validatedReq?.ott_bill,
-        parent_donation: validatedReq?.parent_donation,
-        other_bill: validatedReq?.other_bill,
-        total_fixed_expenses: validatedReq?.total_fixed_expenses,
-        monthly_income: validatedReq?.monthly_income,
-        total_emi: validatedReq?.total_emi,
-        emergency_fund: requiredFund,
-      };
-
-      const res = await prisma.finance.update({
-        where: {
-          user_id: userId,
-        },
-        data: updatedData,
-      });
-      return NextResponse.json({
-        total_fixed_expenses: res.total_fixed_expenses,
-      });
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
     }
-    return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
-    );
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const requiredFund = calculateEmergencyFund({
+      total_fixed_expenses: validatedReq?.total_fixed_expenses,
+      monthly_income: validatedReq?.monthly_income,
+      job_stability: requiredData?.job_stability,
+    });
+
+    const updatedData = {
+      ...requiredData,
+      house_rent: validatedReq?.house_rent,
+      electricity_bill: validatedReq?.electricity_bill,
+      utility_bill: validatedReq?.utility_bill,
+      food_bill: validatedReq?.food_bill,
+      commute_bill: validatedReq?.commute_bill,
+      ott_bill: validatedReq?.ott_bill,
+      parent_donation: validatedReq?.parent_donation,
+      other_bill: validatedReq?.other_bill,
+      total_fixed_expenses: validatedReq?.total_fixed_expenses,
+      monthly_income: validatedReq?.monthly_income,
+      total_emi: validatedReq?.total_emi,
+      emergency_fund: requiredFund,
+    };
+
+    const res = await prisma.finance.update({
+      where: {
+        user_id: String(verifiedTokenData.payload.userId),
+      },
+      data: updatedData,
+    });
+    return NextResponse.json({
+      total_fixed_expenses: res.total_fixed_expenses,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();

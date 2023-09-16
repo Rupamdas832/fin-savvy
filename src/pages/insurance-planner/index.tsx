@@ -1,5 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
@@ -9,8 +8,6 @@ import LogoBadge from "@/components/badge/LogoBadge";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { axiosInstance } from "@/api/api";
-import { InsuranceType } from "@/types/finance.type";
-import { useRouter } from "next/router";
 
 const tipsListEmergencyFund = [
   {
@@ -36,43 +33,20 @@ const tipsListEmergencyFund = [
 ];
 
 const InsurancePlanner = () => {
-  const [insuranceData, setInsuranceData] = useState<InsuranceType | null>(
-    null
-  );
-  const [annualIncome, setAnnualIncome] = useState(
-    insuranceData?.monthly_income ? insuranceData?.monthly_income * 12 : 0
-  );
-  const [lifeCover, setLifeCover] = useState(
-    insuranceData?.life_insurance_cover ?? 0
-  );
-  const [criticalIllnessCover, setCriticalIllnessCover] = useState(
-    insuranceData?.critical_illness_cover ?? 0
-  );
-  const [accidentalCover, setAccidentalCover] = useState(
-    insuranceData?.accidental_death_cover ?? 0
-  );
-  const [loanAmount, setLoanAmount] = useState(
-    insuranceData?.total_loan_amount ?? 0
-  );
-  const [healthCover, setHealthCover] = useState(
-    insuranceData?.health_insurance_cover ?? 0
-  );
-  const [requiredLifeCover, setRequiredLifeCover] = useState(
-    insuranceData?.required__life_insurance_cover ?? 0
-  );
+  const [annualIncome, setAnnualIncome] = useState(0);
+  const [lifeCover, setLifeCover] = useState(0);
+  const [criticalIllnessCover, setCriticalIllnessCover] = useState(0);
+  const [accidentalCover, setAccidentalCover] = useState(0);
+  const [loanAmount, setLoanAmount] = useState(0);
+  const [healthCover, setHealthCover] = useState(0);
+  const [requiredLifeCover, setRequiredLifeCover] = useState(0);
   const [requiredCriticalIllnessCover, setRequiredCriticalIllnessCover] =
-    useState(insuranceData?.required_critical_illness_cover ?? 0);
-  const [requiredAccidentalCover, setRequiredAccidentalCover] = useState(
-    insuranceData?.required_accidental_death_cover ?? 0
-  );
-  const [requiredHealthCover, setRequiredHealthCover] = useState(
-    insuranceData?.required_health_insurance_cover ?? 0
-  );
+    useState(0);
+  const [requiredAccidentalCover, setRequiredAccidentalCover] = useState(0);
+  const [requiredHealthCover, setRequiredHealthCover] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const { query } = useRouter();
-  const { userId } = query;
+  const [isError, setIsError] = useState<string | null>(null);
 
   const fetchInitData = async () => {
     try {
@@ -81,10 +55,20 @@ const InsurancePlanner = () => {
         "/api/finances/insurance-planner"
       );
       if (status === 200) {
-        setInsuranceData(data);
+        setAnnualIncome(data?.monthly_income * 12);
+        setLifeCover(data?.life_insurance_cover);
+        setCriticalIllnessCover(data?.critical_illness_cover);
+        setAccidentalCover(data?.accidental_death_cover);
+        setLoanAmount(data?.total_loan_amount);
+        setHealthCover(data?.health_insurance_cover);
+        setRequiredLifeCover(data?.required__life_insurance_cover);
+        setRequiredCriticalIllnessCover(data?.required_critical_illness_cover);
+        setRequiredAccidentalCover(data?.required_accidental_death_cover);
+        setRequiredHealthCover(data?.required_health_insurance_cover);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error?.message);
     } finally {
       setIsLoading(false);
     }
@@ -95,18 +79,15 @@ const InsurancePlanner = () => {
   }, []);
 
   const updateInsuranceApi = async (payload: any) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(
-        origin + `/api/finances/insurance-planner/?userId=${userId}`,
+      const { data, status } = await axiosInstance.put(
+        "/api/finances/insurance-planner",
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          ...payload,
         }
       );
-      const data = await res.json();
-      if (res.status === 200) {
+      if (status === 200) {
         setRequiredLifeCover(data.required__life_insurance_cover);
         setRequiredHealthCover(data.required_health_insurance_cover);
         setRequiredCriticalIllnessCover(data.required_critical_illness_cover);
@@ -140,7 +121,7 @@ const InsurancePlanner = () => {
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
           </div>
-        ) : insuranceData ? (
+        ) : !isError ? (
           <div className="flex flex-col p-4">
             <div className="flex items-center">
               <p className="text-2xl font-bold mr-2">Insurance Planner</p>
@@ -291,7 +272,9 @@ const InsurancePlanner = () => {
             )}
             <TipsCard list={tipsListEmergencyFund} />
           </div>
-        ) : null}
+        ) : (
+          <div>{isError}</div>
+        )}
       </div>
     </Layout>
   );

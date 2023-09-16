@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/api/api";
 import Button from "@/components/button/Button";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
@@ -11,17 +12,14 @@ const Login = () => {
   const router = useRouter();
 
   const handleLoginClick = async () => {
-    const origin = window.location.origin;
     if (email && password) {
       setIsLoading(true);
       try {
         const payload = { email, password };
-        const res = await fetch(origin + `/api/login`, {
-          method: "POST",
-          body: JSON.stringify(payload),
+        const { data, status } = await axiosInstance.post("/api/login", {
+          ...payload,
         });
-        const data = await res.json();
-        if (res.status === 200) {
+        if (status === 200) {
           router.push(`/dashboard`);
         }
       } catch (error) {

@@ -1,5 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +8,6 @@ import LogoBadge from "@/components/badge/LogoBadge";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FixedExpenseType } from "@/types/finance.type";
-import { useRouter } from "next/router";
 import { axiosInstance, originUrl } from "@/api/api";
 
 const tipsListEmergencyFund = [
@@ -29,36 +27,20 @@ interface IFixedExpense extends FixedExpenseType {
 }
 
 const FixedExpenses = () => {
-  const [fixed_expenses, setFixed_Expenses] = useState<IFixedExpense | null>(
-    null
-  );
-  const [income, setIncome] = useState(fixed_expenses?.monthly_income ?? 0);
-  const [houseRent, setHouseRent] = useState(fixed_expenses?.house_rent ?? 0);
-  const [electricityBill, setElectricityBill] = useState(
-    fixed_expenses?.electricity_bill ?? 0
-  );
-  const [utilityBills, setUtilityBills] = useState(
-    fixed_expenses?.utility_bill ?? 0
-  );
-  const [groceryBills, setGroceryBills] = useState(
-    fixed_expenses?.food_bill ?? 0
-  );
-  const [commuteBills, setCommuteBills] = useState(
-    fixed_expenses?.commute_bill ?? 0
-  );
-  const [emi, setEMI] = useState(fixed_expenses?.total_emi ?? 0);
-  const [ottBills, setOTTBills] = useState(fixed_expenses?.ott_bill ?? 0);
-  const [parentDonation, setParentDonation] = useState(
-    fixed_expenses?.parent_donation ?? 0
-  );
-  const [otherBills, setOtherBills] = useState(fixed_expenses?.other_bill ?? 0);
-  const [totalExpenses, setTotalExpenses] = useState(
-    fixed_expenses?.total_fixed_expenses ?? 0
-  );
+  const [income, setIncome] = useState(0);
+  const [houseRent, setHouseRent] = useState(0);
+  const [electricityBill, setElectricityBill] = useState(0);
+  const [utilityBills, setUtilityBills] = useState(0);
+  const [groceryBills, setGroceryBills] = useState(0);
+  const [commuteBills, setCommuteBills] = useState(0);
+  const [emi, setEMI] = useState(0);
+  const [ottBills, setOTTBills] = useState(0);
+  const [parentDonation, setParentDonation] = useState(0);
+  const [otherBills, setOtherBills] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { query } = useRouter();
-  const { userId } = query;
+  const [isError, setIsError] = useState<string | null>(null);
 
   const fetchInitData = async () => {
     try {
@@ -67,10 +49,21 @@ const FixedExpenses = () => {
         "/api/finances/fixed-expenses"
       );
       if (status === 200) {
-        setFixed_Expenses(data);
+        setIncome(data?.monthly_income);
+        setHouseRent(data?.house_rent);
+        setElectricityBill(data?.electricity_bill);
+        setUtilityBills(data?.utility_bill);
+        setGroceryBills(data?.food_bill);
+        setCommuteBills(data?.commute_bill);
+        setEMI(data?.total_emi);
+        setOTTBills(data?.ott_bill);
+        setParentDonation(data?.parent_donation);
+        setOtherBills(data?.other_bill);
+        setTotalExpenses(data?.total_fixed_expenses);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -81,18 +74,15 @@ const FixedExpenses = () => {
   }, []);
 
   const updateExpenseApi = async (payload: IFixedExpense) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(
-        origin + `/api/finances/fixed-expenses/?userId=${userId}`,
+      const { data, status } = await axiosInstance.put(
+        "/api/finances/fixed-expenses",
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          ...payload,
         }
       );
-      const data = await res.json();
-      if (res.status === 200) {
+      if (status === 200) {
         setTotalExpenses(data.total_fixed_expenses);
       }
     } catch (error) {
@@ -115,7 +105,6 @@ const FixedExpenses = () => {
       otherBills;
 
     const payload: IFixedExpense = {
-      ...fixed_expenses,
       monthly_income: income,
       house_rent: houseRent,
       electricity_bill: electricityBill,
@@ -138,7 +127,7 @@ const FixedExpenses = () => {
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
           </div>
-        ) : fixed_expenses ? (
+        ) : !isError ? (
           <div className="flex flex-col p-4">
             <div className="flex items-center">
               <p className="text-2xl font-bold mr-2">Fixed Expenses</p>
@@ -308,7 +297,9 @@ const FixedExpenses = () => {
             )}
             <TipsCard list={tipsListEmergencyFund} />
           </div>
-        ) : null}
+        ) : (
+          <div>{isError}</div>
+        )}
       </div>
     </Layout>
   );

@@ -1,5 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faSackDollar } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +8,6 @@ import { useEffect, useState } from "react";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 import LogoBadge from "@/components/badge/LogoBadge";
 import { axiosInstance } from "@/api/api";
-import { useRouter } from "next/router";
 
 const tipsListEmergencyFund = [
   { id: 1, text: "Invest in liquid assets to build your emergency fund." },
@@ -23,33 +21,15 @@ const tipsListEmergencyFund = [
   },
 ];
 
-interface IEmergencyFund {
-  emergency_fund: number;
-  monthly_income: number;
-  job_stability: number;
-  savings: number;
-  total_fixed_expenses: number;
-}
 const EmergencyFund = () => {
-  const [emergencyFundData, setEmergencyFundData] =
-    useState<IEmergencyFund | null>(null);
-  const [monthlyIncome, setMonthlyIncome] = useState(
-    emergencyFundData?.monthly_income ?? 0
-  );
-  const [savings, setSavings] = useState(emergencyFundData?.savings ?? 0);
-  const [fixedExpenses, setFixedExpenses] = useState(
-    emergencyFundData?.total_fixed_expenses ?? 0
-  );
-  const [stability, setStability] = useState(
-    emergencyFundData?.job_stability ?? 0
-  );
-  const [emergencyFund, setEmergencyFund] = useState(
-    emergencyFundData?.emergency_fund ?? 0
-  );
+  const [monthlyIncome, setMonthlyIncome] = useState(0);
+  const [savings, setSavings] = useState(0);
+  const [fixedExpenses, setFixedExpenses] = useState(0);
+  const [stability, setStability] = useState(0);
+  const [emergencyFund, setEmergencyFund] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const { query } = useRouter();
-  const { userId } = query;
 
   const fetchInitData = async () => {
     try {
@@ -58,10 +38,15 @@ const EmergencyFund = () => {
         "/api/finances/emergency-fund"
       );
       if (status === 200) {
-        setEmergencyFundData(data);
+        setMonthlyIncome(data?.monthly_income);
+        setSavings(data?.savings);
+        setFixedExpenses(data?.total_fixed_expenses);
+        setStability(data?.job_stability);
+        setEmergencyFund(data?.emergency_fund);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error?.message as string);
     } finally {
       setIsLoading(false);
     }
@@ -72,18 +57,17 @@ const EmergencyFund = () => {
   }, []);
 
   const updateEmergencyApi = async (payload: any) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(
-        origin + `/api/finances/emergency-fund/?userId=${userId}`,
+      const { data, status } = await axiosInstance.put(
+        "/api/finances/emergency-fund",
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          ...payload,
         }
       );
-      const data = await res.json();
-      setEmergencyFund(data.emergency_fund);
+      if (status === 200) {
+        setEmergencyFund(data.emergency_fund);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -109,7 +93,7 @@ const EmergencyFund = () => {
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
           </div>
-        ) : emergencyFundData ? (
+        ) : !isError ? (
           <div className="flex flex-col p-4">
             <div className="flex items-center">
               <p className="text-2xl font-bold mr-2">Emergency Fund</p>
@@ -203,7 +187,9 @@ const EmergencyFund = () => {
             )}
             <TipsCard list={tipsListEmergencyFund} />
           </div>
-        ) : null}
+        ) : (
+          <div>{isError}</div>
+        )}
       </div>
     </Layout>
   );

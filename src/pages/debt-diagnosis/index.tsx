@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import { axiosInstance } from "@/api/api";
 import { DebtType } from "@/types/finance.type";
-import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProgressCard from "@/components/progressCard/ProgressCard";
 
@@ -34,21 +33,14 @@ const tipsListEmergencyFund = [
 ];
 
 const DebtDiagnosis = () => {
-  const [debtData, setDebtData] = useState<DebtType | null>(null);
-  const [monthlyIncome, setMontlyIncome] = useState(
-    debtData?.monthly_income ?? 0
-  );
-  const [loan, setLoan] = useState(debtData?.total_loan_amount ?? 0);
-  const [emi, setEMI] = useState(debtData?.total_emi ?? 0);
-  const [totalSavings, setTotalSavings] = useState(
-    debtData?.total_savings ?? 0
-  );
-  const [emiLoad, setEmiLoad] = useState(debtData?.emi_load ?? 0);
+  const [monthlyIncome, setMontlyIncome] = useState(0);
+  const [loan, setLoan] = useState(0);
+  const [emi, setEMI] = useState(0);
+  const [totalSavings, setTotalSavings] = useState(0);
+  const [emiLoad, setEmiLoad] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const { query } = useRouter();
-  const { userId } = query;
+  const [isError, setIsError] = useState<string | null>(null);
 
   const fetchInitData = async () => {
     try {
@@ -57,10 +49,15 @@ const DebtDiagnosis = () => {
         "/api/finances/debt-diagnosis"
       );
       if (status === 200) {
-        setDebtData(data);
+        setMontlyIncome(data?.monthly_income);
+        setLoan(data?.total_loan_amount);
+        setEMI(data?.total_emi);
+        setTotalSavings(data?.total_savings);
+        setEmiLoad(data?.emi_load);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -71,18 +68,15 @@ const DebtDiagnosis = () => {
   }, []);
 
   const updateDebtApi = async (payload: any) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(
-        origin + `/api/finances/debt-diagnosis/?userId=${userId}`,
+      const { data, status } = await axiosInstance.put(
+        "/api/finances/debt-diagnosis",
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          ...payload,
         }
       );
-      const data = await res.json();
-      if (res.status === 200) {
+      if (status === 200) {
         setEmiLoad(data.emi_load);
       }
     } catch (error) {
@@ -111,7 +105,7 @@ const DebtDiagnosis = () => {
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
           </div>
-        ) : debtData ? (
+        ) : !isError ? (
           <div className="flex flex-col p-4">
             <div className="flex items-center">
               <p className="text-2xl font-bold mr-2">Debt Diagnosis</p>
@@ -203,7 +197,9 @@ const DebtDiagnosis = () => {
 
             <TipsCard list={tipsListEmergencyFund} />
           </div>
-        ) : null}
+        ) : (
+          <div>{isError}</div>
+        )}
       </div>
     </Layout>
   );

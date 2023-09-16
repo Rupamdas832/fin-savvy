@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/api/api";
 import Button from "@/components/button/Button";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
@@ -12,7 +13,6 @@ const Login = () => {
   const router = useRouter();
 
   const handleSignupClick = async () => {
-    const origin = window.location.origin;
     if (email && password && firstName && lastName) {
       try {
         const payload = {
@@ -21,14 +21,11 @@ const Login = () => {
           first_name: firstName,
           last_name: lastName,
         };
-
-        const res = await fetch(origin + `/api/users`, {
-          method: "POST",
-          body: JSON.stringify(payload),
+        const { data, status } = await axiosInstance.post("/api/users", {
+          ...payload,
         });
-        const data = await res.json();
-        if (res.status === 200) {
-          router.push(`/onboarding/?${data.userData.user_id}`);
+        if (status === 200) {
+          router.push(`/onboarding`);
         }
       } catch (error) {
         console.log(error);

@@ -1,5 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import TipsCard from "@/components/tipsCard/TipsCard";
 import { faBuildingColumns } from "@fortawesome/free-solid-svg-icons";

@@ -1,5 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import Navbar from "@/components/navbar/Navbar";
 import Button from "@/components/button/Button";
 import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import { faCar } from "@fortawesome/free-solid-svg-icons";
@@ -71,8 +70,7 @@ const Expenses = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { query } = router;
-  const { userId } = query;
+  const [isError, setIsError] = useState<string | null>(null);
 
   const fetchInitData = async () => {
     try {
@@ -81,8 +79,9 @@ const Expenses = () => {
       if (status === 200) {
         setExpenseList(data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsError(error?.message);
     } finally {
       setIsLoading(false);
     }
@@ -93,15 +92,12 @@ const Expenses = () => {
   }, []);
 
   const postNewExpense = async (payload: ExpenseType) => {
-    const origin = window.location.origin;
     try {
       setIsSaving(true);
-      const res = await fetch(origin + `/api/expenses`, {
-        method: "POST",
-        body: JSON.stringify(payload),
+      const { data, status } = await axiosInstance.post("/api/expenses", {
+        ...payload,
       });
-      const data = await res.json();
-      if (res.status === 200) {
+      if (status === 200) {
         setExpenseList((expenseList) => [...expenseList, data]);
       }
     } catch (error) {
@@ -115,7 +111,6 @@ const Expenses = () => {
   const handleAddClick = () => {
     if (title && expenseCategoryId && amount) {
       const newExpense: ExpenseType = {
-        user_id: userId as string,
         description: title,
         expense_category_id: expenseCategoryId,
         amount,
