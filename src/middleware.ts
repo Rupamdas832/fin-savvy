@@ -20,15 +20,17 @@ async function isAuthenticated(req: NextRequest) {
   }
 }
 
+const publicRoutes = ["/login", "/signup"];
+
 export async function middleware(req: any) {
   const requestedPathname = req.nextUrl.pathname;
 
   const isAuth = await isAuthenticated(req);
 
-  if (requestedPathname === "/login" && isAuth === true) {
+  if (publicRoutes.includes(requestedPathname) && isAuth === true) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
-  } else if (requestedPathname !== "/login" && isAuth === false) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  } else if (!publicRoutes.includes(requestedPathname) && isAuth === false) {
+    return NextResponse.redirect(new URL(requestedPathname, req.url));
   }
 }
 

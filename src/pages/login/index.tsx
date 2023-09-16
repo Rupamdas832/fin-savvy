@@ -34,8 +34,8 @@ const Login = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col items-center justify-center w-full min-h-screen bg-black text-white">
-        <div className="flex flex-col p-4">
+      <div className="fixed left-0 right-0 top-0 bottom-0 w-full min-h-screen bg-black text-white">
+        <div className="flex flex-col p-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5">
           <p className="text-4xl font-bold ">Log into your</p>
           <p className="text-4xl font-bold ">account</p>
           <p className="text-sm  mt-2">
