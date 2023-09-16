@@ -20,7 +20,7 @@ export async function POST(req: any) {
     const requestedUser = await prisma.user.findFirst({
       where: {
         email: {
-          equals: validatedReq.email,
+          equals: validatedReq.email.toLowerCase(),
         },
       },
     });

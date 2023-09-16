@@ -89,7 +89,7 @@ const Savings = () => {
         <div className="flex items-center justify-center w-full h-screen">
           <p>Loading...</p>
         </div>
-      ) : (
+      ) : !isError ? (
         <div className="flex flex-col w-full min-h-screen bg-white text-black">
           <div className="flex flex-col p-4">
             <div className="flex items-center">
@@ -165,6 +165,8 @@ const Savings = () => {
             <TipsCard list={tipsListEmergencyFund} />
           </div>
         </div>
+      ) : (
+        <div>{isError}</div>
       )}
     </Layout>
   );

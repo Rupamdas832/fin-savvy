@@ -139,7 +139,7 @@ const Expenses = () => {
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
           </div>
-        ) : (
+        ) : !isError ? (
           <div className="flex flex-col p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -268,6 +268,8 @@ const Expenses = () => {
               </Modal>
             )}
           </div>
+        ) : (
+          <div>{isError}</div>
         )}
       </div>
     </Layout>
