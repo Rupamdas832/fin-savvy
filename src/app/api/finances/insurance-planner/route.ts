@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/app/db/db";
 import { Prisma } from "@prisma/client";
 import { InsuranceType } from "@/types/finance.type";
+import { cookies } from "next/headers";
+import { verify } from "@/lib/jwt";
 
 const InsuranceSchema = z.object({
   life_insurance_cover: z.number(),
@@ -14,43 +16,50 @@ const InsuranceSchema = z.object({
 });
 
 export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
   try {
-    if (userId) {
-      const requiredData = await prisma.finance.findFirst({
-        where: {
-          user_id: {
-            equals: userId,
-          },
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-      let insuranceData: InsuranceType = {
-        monthly_income: requiredData.monthly_income,
-        life_insurance_cover: requiredData.life_insurance_cover,
-        critical_illness_cover: requiredData.critical_illness_cover,
-        accidental_death_cover: requiredData.accidental_death_cover,
-        health_insurance_cover: requiredData.health_insurance_cover,
-        required__life_insurance_cover:
-          requiredData.required__life_insurance_cover,
-        required_critical_illness_cover:
-          requiredData.required_critical_illness_cover,
-        required_accidental_death_cover:
-          requiredData.required_accidental_death_cover,
-        required_health_insurance_cover:
-          requiredData.required_health_insurance_cover,
-        total_loan_amount: requiredData.total_loan_amount,
-      };
-      return NextResponse.json(insuranceData);
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
     }
-    return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
-    );
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    let insuranceData: InsuranceType = {
+      monthly_income: requiredData.monthly_income,
+      life_insurance_cover: requiredData.life_insurance_cover,
+      critical_illness_cover: requiredData.critical_illness_cover,
+      accidental_death_cover: requiredData.accidental_death_cover,
+      health_insurance_cover: requiredData.health_insurance_cover,
+      required__life_insurance_cover:
+        requiredData.required__life_insurance_cover,
+      required_critical_illness_cover:
+        requiredData.required_critical_illness_cover,
+      required_accidental_death_cover:
+        requiredData.required_accidental_death_cover,
+      required_health_insurance_cover:
+        requiredData.required_health_insurance_cover,
+      total_loan_amount: requiredData.total_loan_amount,
+    };
+    return NextResponse.json(insuranceData);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();

@@ -3,6 +3,8 @@ import { SavingType } from "@/types/finance.type";
 import { z } from "zod";
 import { prisma } from "@/app/db/db";
 import { Prisma } from "@prisma/client";
+import { cookies } from "next/headers";
+import { verify } from "@/lib/jwt";
 
 const SavingsSchema = z.object({
   bank_balance: z.number(),
@@ -13,34 +15,41 @@ const SavingsSchema = z.object({
 });
 
 export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
   try {
-    if (userId) {
-      const requiredData = await prisma.finance.findFirst({
-        where: {
-          user_id: {
-            equals: userId,
-          },
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-      let savings: SavingType = {
-        bank_balance: requiredData.bank_balance,
-        fd_balance: requiredData.fd_balance,
-        equity_balance: requiredData.equity_balance,
-        gold_balance: requiredData.gold_balance,
-        total_savings: requiredData.total_savings,
-      };
-      return NextResponse.json(savings);
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
     }
-    return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
-    );
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    let savings: SavingType = {
+      bank_balance: requiredData.bank_balance,
+      fd_balance: requiredData.fd_balance,
+      equity_balance: requiredData.equity_balance,
+      gold_balance: requiredData.gold_balance,
+      total_savings: requiredData.total_savings,
+    };
+    return NextResponse.json(savings);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();

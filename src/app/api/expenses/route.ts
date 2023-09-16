@@ -1,25 +1,40 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/app/db/db";
 import { Prisma } from "@prisma/client";
+import { cookies } from "next/headers";
+import { verify } from "@/lib/jwt";
 
 const ExpenseSchema = z.object({
-  user_id: z.string(),
   description: z.string(),
   expense_category_id: z.string(),
   amount: z.number(),
   expense_date: z.string(),
 });
 
-export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
+export async function GET(request: NextRequest) {
   try {
-    if (userId) {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    if (verifiedTokenData.payload?.userId) {
       const requiredData = await prisma.expenses.findMany({
         where: {
-          user_id: { equals: userId },
+          user_id: { equals: String(verifiedTokenData.payload.userId) },
         },
       });
 
@@ -52,10 +67,27 @@ export async function POST(req: any) {
   const requestBody = await req.json();
 
   try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const validatedReq = ExpenseSchema.parse(requestBody);
     const requiredUser = await prisma.user.findFirst({
       where: {
-        user_id: { equals: validatedReq.user_id },
+        user_id: { equals: String(verifiedTokenData.payload.userId) },
       },
     });
 
@@ -65,6 +97,7 @@ export async function POST(req: any) {
     const payload = {
       ...validatedReq,
       expense_date: new Date(validatedReq.expense_date),
+      user_id: String(verifiedTokenData.payload.userId),
     };
 
     const newExpense = await prisma.expenses.create({

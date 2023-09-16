@@ -7,6 +7,8 @@ import { z } from "zod";
 import { prisma } from "@/app/db/db";
 import { Prisma } from "@prisma/client";
 import { DebtType, FinanceType } from "@/types/finance.type";
+import { cookies } from "next/headers";
+import { verify } from "@/lib/jwt";
 
 const DebtSchema = z.object({
   monthly_income: z.number(),
@@ -16,35 +18,41 @@ const DebtSchema = z.object({
 });
 
 export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
   try {
-    if (userId) {
-      const requiredData = await prisma.finance.findFirst({
-        where: {
-          user_id: {
-            equals: userId,
-          },
-        },
-      });
-      if (!requiredData) return NextResponse.json({ error: "User not found" });
-
-      let debtData: DebtType = {
-        monthly_income: requiredData?.monthly_income,
-        total_savings: requiredData?.total_savings,
-        total_emi: requiredData?.total_emi,
-        total_loan_amount: requiredData?.total_loan_amount,
-        emi_load: requiredData?.emi_load,
-      };
-
-      return NextResponse.json(debtData);
-    } else {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
       return NextResponse.json(
-        { message: "Please provide user id" },
-        { status: 400 }
+        { message: "Not authenticated" },
+        { status: 401 }
       );
     }
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredData) return NextResponse.json({ error: "User not found" });
+
+    let debtData: DebtType = {
+      monthly_income: requiredData?.monthly_income,
+      total_savings: requiredData?.total_savings,
+      total_emi: requiredData?.total_emi,
+      total_loan_amount: requiredData?.total_loan_amount,
+      emi_load: requiredData?.emi_load,
+    };
+
+    return NextResponse.json(debtData);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();

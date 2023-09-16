@@ -7,58 +7,49 @@ import { UserType } from "@/types/user.type";
 import { axiosInstance, originUrl } from "@/api/api";
 import { FinanceType } from "@/types/finance.type";
 import { ExpenseType } from "@/types/expenses.type";
+import { useEffect, useState } from "react";
 
-export async function getServerSideProps(context: any) {
-  const { query } = context;
-  const { userId } = query;
-  let userData = {};
-  let financeData = {};
-  let expenses = [];
-  try {
-    const { status, data } = await axiosInstance.get(
-      `/api/users/?userId=${userId}`
-    );
-    if (status === 200) {
-      userData = data;
+const Dashboard = () => {
+  const [user, setUser] = useState<UserType | null>(null);
+  const [finance, setFinance] = useState<FinanceType | null>(null);
+  const [expenses, setExpenses] = useState<ExpenseType[] | null>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchData = async () => {
+    const userApi = () => axiosInstance.get("/api/users");
+    const financeApi = () => axiosInstance.get("/api/finances");
+    const expensesApi = () => axiosInstance.get("/api/expenses");
+
+    try {
+      setIsLoading(true);
+      const response: any = await Promise.all([
+        userApi(),
+        financeApi(),
+        expensesApi(),
+      ]);
+      if (response.length > 0) {
+        setUser(response[0].data);
+        setFinance(response[1].data);
+        setExpenses(response[2].data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const { data, status } = await axiosInstance.get(
-      `/api/finances/?userId=${userId}`
-    );
-    if (status === 200) {
-      financeData = data;
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const { data, status } = await axiosInstance.get(
-      `/api/expenses/?userId=${userId}`
-    );
-    if (status === 200) {
-      expenses = data;
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  return {
-    props: { user: userData, finance: financeData, expenses },
   };
-}
 
-interface DashboardProps {
-  user: UserType;
-  finance: FinanceType;
-  expenses: ExpenseType[];
-}
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-const Dashboard = ({ user, finance, expenses }: DashboardProps) => {
   return (
     <Layout>
-      {user?.user_id ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center w-full h-screen">
+          <p>Loading...</p>
+        </div>
+      ) : user && finance && expenses ? (
         <div className="flex flex-col w-full">
           <Navbar user_id={user.user_id} first_name={user.first_name} />
           <DashboardHeroBanner
@@ -71,7 +62,7 @@ const Dashboard = ({ user, finance, expenses }: DashboardProps) => {
         </div>
       ) : (
         <div className="flex items-center justify-center w-full h-screen">
-          <p>User not found! Please try again.</p>
+          <p>User not found...</p>
         </div>
       )}
     </Layout>

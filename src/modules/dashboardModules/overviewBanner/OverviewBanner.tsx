@@ -80,7 +80,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push(`/emergency-fund/?userId=${user_id}`)}
+          onClick={() => router.push(`/emergency-fund`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faSackDollar} color="bg-green-400" />
@@ -94,7 +94,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push(`/insurance-planner/?userId=${user_id}`)}
+          onClick={() => router.push(`/insurance-planner`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faShieldHalved} color="bg-pink-400" />
@@ -106,7 +106,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push(`/debt-diagnosis/?userId=${user_id}`)}
+          onClick={() => router.push(`/debt-diagnosis`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faHandHoldingDollar} color="bg-cyan-400" />
@@ -118,7 +118,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
         </div>
         <div
           className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl cursor-pointer"
-          onClick={() => router.push(`/tax-saving/?userId=${user_id}`)}
+          onClick={() => router.push(`/tax-saving`)}
         >
           <div className="flex flex-col justify-between">
             <LogoBadge logo={faBuildingColumns} color="bg-amber-400" />

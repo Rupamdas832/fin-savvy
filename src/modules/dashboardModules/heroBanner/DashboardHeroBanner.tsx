@@ -29,7 +29,7 @@ const DashboardHeroBanner = ({
     <div className="flex flex-col p-4">
       <div
         className="flex items-center w-full p-4 rounded-2xl bg-gray-800 cursor-pointer"
-        onClick={() => router.push(`/savings/?userId=${user.user_id}`)}
+        onClick={() => router.push(`/savings`)}
       >
         <FontAwesomeIcon
           icon={faSackDollar}
@@ -57,7 +57,7 @@ const DashboardHeroBanner = ({
         </div>
         <div
           className="flex flex-1 items-center p-4 rounded-2xl bg-gray-800 cursor-pointer"
-          onClick={() => router.push(`/expenses/?userId=${user.user_id}`)}
+          onClick={() => router.push(`/expenses`)}
         >
           <FontAwesomeIcon
             icon={faCircleDown}

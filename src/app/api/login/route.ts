@@ -34,7 +34,7 @@ export async function POST(req: any) {
       if (isValidPassword === true) {
         const token = await sign({
           email: requestedUser.email,
-          user_id: requestedUser.user_id,
+          userId: requestedUser.user_id,
         });
         const oneDay = 60 * 60 * 1000 * 24;
 

@@ -3,6 +3,8 @@ import { prisma } from "../../db/db";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { hash } from "@/lib/hash";
+import { cookies } from "next/headers";
+import { verify } from "@/lib/jwt";
 
 const UserSchema = z.object({
   first_name: z.string(),
@@ -12,22 +14,45 @@ const UserSchema = z.object({
 });
 
 export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-  if (userId) {
-    const requiredUser = await prisma.user.findFirst({
-      where: {
-        user_id: { equals: userId },
-      },
-    });
-    if (!requiredUser) return NextResponse.json({ error: "User not found" });
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    if (verifiedTokenData.payload?.userId) {
+      const requiredUser = await prisma.user.findFirst({
+        where: {
+          user_id: { equals: String(verifiedTokenData.payload.userId) },
+        },
+      });
+      if (!requiredUser) return NextResponse.json({ error: "User not found" });
 
-    return NextResponse.json(requiredUser);
+      return NextResponse.json(requiredUser);
+    }
+
+    const users = await prisma.user.findMany();
+    return NextResponse.json(users);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
-
-  const users = await prisma.user.findMany();
-  return NextResponse.json(users);
 }
 
 export async function POST(req: any) {

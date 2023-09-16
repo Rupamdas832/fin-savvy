@@ -1,60 +1,90 @@
 import { prisma } from "@/app/db/db";
+import { verify } from "@/lib/jwt";
+import { Prisma } from "@prisma/client";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
   try {
-    if (userId) {
-      const requiredData = await prisma.finance.findUnique({
-        where: {
-          user_id: userId,
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json(
-          { message: "Finance data not found" },
-          { status: 404 }
-        );
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-      return NextResponse.json(requiredData);
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findUnique({
+      where: {
+        user_id: String(verifiedTokenData.payload.userId),
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json(
+        { message: "Finance data not found" },
+        { status: 404 }
+      );
+
+    return NextResponse.json(requiredData);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
     }
     return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
+      { message: "Something went wrong" },
+      { status: 500 }
     );
-  } catch (error) {
-    console.log(error);
   }
 }
 
 export async function DELETE(request: any) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
   try {
-    if (userId) {
-      const requiredData = await prisma.finance.delete({
-        where: {
-          user_id: userId,
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json(
-          { message: "Finance data not found" },
-          { status: 404 }
-        );
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-      return NextResponse.json({
-        message: "Finance data successfully deleted",
-      });
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const requiredData = await prisma.finance.delete({
+      where: {
+        user_id: String(verifiedTokenData.payload.userId),
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json(
+        { message: "Finance data not found" },
+        { status: 404 }
+      );
+
+    return NextResponse.json({
+      message: "Finance data successfully deleted",
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
     }
     return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
+      { message: "Something went wrong" },
+      { status: 500 }
     );
-  } catch (error) {
-    console.log(error);
   }
 }

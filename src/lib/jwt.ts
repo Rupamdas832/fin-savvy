@@ -10,7 +10,7 @@ export const sign = async (payload: jose.JWTPayload) => {
     .setIssuedAt()
     .setIssuer("urn:example:issuer")
     .setAudience("urn:example:audience")
-    .setExpirationTime("1h")
+    .setExpirationTime("24h")
     .sign(secret);
 
   return jwt;

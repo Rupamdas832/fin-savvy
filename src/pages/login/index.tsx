@@ -7,11 +7,13 @@ import { useState } from "react";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLoginClick = async () => {
     const origin = window.location.origin;
     if (email && password) {
+      setIsLoading(true);
       try {
         const payload = { email, password };
         const res = await fetch(origin + `/api/login`, {
@@ -20,10 +22,12 @@ const Login = () => {
         });
         const data = await res.json();
         if (res.status === 200) {
-          router.push(`/onboarding/?${data.userId}`);
+          router.push(`/dashboard`);
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -56,7 +60,13 @@ const Login = () => {
             />
           </div>
           <div className="flex flex-col mt-8">
-            <Button text="Log in" theme="LIGHT" onClick={handleLoginClick} />
+            <Button
+              text={isLoading ? "Loging in" : "Log in"}
+              theme="LIGHT"
+              onClick={handleLoginClick}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            />
           </div>
           <Link href="/signup" className="mt-2 text-center">
             <p className="text-sm">Need an account? Register</p>
