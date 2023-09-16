@@ -43,7 +43,6 @@ const TaxSaving = () => {
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar />
         <div className="flex flex-col p-4">
           <div className="flex items-center">
             <p className="text-2xl font-bold mr-2">Tax Saving</p>

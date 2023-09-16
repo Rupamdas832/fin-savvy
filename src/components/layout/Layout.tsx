@@ -2,6 +2,7 @@ import "../../app/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import NavigationLoader from "../navigationLoader/NavigationLoader";
+import Navbar from "../navbar/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     //   <body className={inter.className}>
     <div className="flex w-full items-center justify-center">
       <NavigationLoader />
-      <div style={{ width: "640px" }}>{children}</div>
+      <div style={{ width: "640px" }}>
+        <Navbar />
+        {children}
+      </div>
     </div>
     //   </body>
     // </html>

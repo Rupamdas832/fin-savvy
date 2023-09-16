@@ -51,7 +51,6 @@ const Dashboard = () => {
         </div>
       ) : user && finance && expenses ? (
         <div className="flex flex-col w-full">
-          <Navbar user_id={user.user_id} first_name={user.first_name} />
           <DashboardHeroBanner
             user={user}
             finance={finance}

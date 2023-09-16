@@ -105,7 +105,6 @@ const EmergencyFund = () => {
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
-        <Navbar user_id={userId as string} />
         {isLoading ? (
           <div className="flex items-center justify-center w-full h-screen">
             <p>Loading...</p>
