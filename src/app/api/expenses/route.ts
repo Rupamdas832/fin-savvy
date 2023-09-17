@@ -10,6 +10,15 @@ const ExpenseSchema = z.object({
   expense_category_id: z.string(),
   amount: z.number(),
   expense_date: z.string(),
+  expense_id: z.string(),
+});
+
+const CreateExpenseSchema = ExpenseSchema.partial({
+  expense_id: true,
+});
+
+const DeleteExpenseSchema = z.object({
+  expense_id: z.string(),
 });
 
 export async function GET(request: NextRequest) {
@@ -84,15 +93,7 @@ export async function POST(req: any) {
       );
     }
 
-    const validatedReq = ExpenseSchema.parse(requestBody);
-    const requiredUser = await prisma.user.findFirst({
-      where: {
-        user_id: { equals: String(verifiedTokenData.payload.userId) },
-      },
-    });
-
-    if (!requiredUser)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const validatedReq = CreateExpenseSchema.parse(requestBody);
 
     const payload = {
       ...validatedReq,
@@ -104,6 +105,94 @@ export async function POST(req: any) {
       data: payload,
     });
     return NextResponse.json(newExpense);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: any) {
+  const requestBody = await req.json();
+
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const validatedReq = ExpenseSchema.parse(requestBody);
+
+    const payload = {
+      ...validatedReq,
+      user_id: String(verifiedTokenData.payload.userId),
+    };
+
+    const updateExpense = await prisma.expenses.update({
+      where: { expense_id: validatedReq.expense_id },
+      data: payload,
+    });
+    return NextResponse.json(updateExpense);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: any) {
+  const requestBody = await req.json();
+
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const validatedReq = DeleteExpenseSchema.parse(requestBody);
+
+    const deleteExpense = await prisma.expenses.delete({
+      where: { expense_id: validatedReq.expense_id },
+    });
+    return NextResponse.json(deleteExpense);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();
