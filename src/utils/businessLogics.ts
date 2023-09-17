@@ -23,3 +23,16 @@ export const calculateDebtLoad = (props: CalculateDebtLoadProps) => {
   const load = (props.total_emi / props.monthly_income) * 100;
   return Number(load.toFixed(0));
 };
+
+export const calculateLoanAmountOfMonthlyEmi = (
+  interest: number,
+  loanTenure: number,
+  monthlyEMI: number
+) => {
+  const monthlyInterest = interest / 12;
+  const powerValue = Math.pow(1 + monthlyInterest / 100, loanTenure * 12);
+  const result =
+    (monthlyEMI * (powerValue - 1)) / ((monthlyInterest * powerValue) / 100);
+
+  return Number(result.toFixed(0));
+};

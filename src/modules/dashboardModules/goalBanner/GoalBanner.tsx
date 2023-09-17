@@ -5,8 +5,10 @@ import {
   faPlane,
   faRing,
 } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 
 const GoalBanner = () => {
+  const router = useRouter();
   return (
     <div className="flex flex-col p-4 bg-white text-black">
       <p className="text-base font-bold">Goals</p>
@@ -17,7 +19,10 @@ const GoalBanner = () => {
             <p className="text-sm">Dream House</p>
           </div>
         </div>
-        <div className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl">
+        <div
+          className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl"
+          onClick={() => router.push("/goals/car")}
+        >
           <div className="flex flex-col justify-between items-start">
             <LogoBadge logo={faCarSide} color="bg-emerald-400" />
             <p className="text-sm">Dream Car</p>
