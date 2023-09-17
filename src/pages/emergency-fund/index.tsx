@@ -27,13 +27,12 @@ const EmergencyFund = () => {
   const [fixedExpenses, setFixedExpenses] = useState(0);
   const [stability, setStability] = useState(0);
   const [emergencyFund, setEmergencyFund] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchInitData = async () => {
     try {
-      setIsLoading(true);
       const { data, status } = await axiosInstance.get(
         "/api/finances/emergency-fund"
       );

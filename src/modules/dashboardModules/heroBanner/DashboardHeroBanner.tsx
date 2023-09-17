@@ -10,7 +10,7 @@ import { useMemo } from "react";
 
 interface DashboardHeroBannerProps {
   user: UserType;
-  finance: FinanceType;
+  finance: FinanceType | null;
   expenses: ExpenseType[];
 }
 
@@ -67,9 +67,11 @@ const DashboardHeroBanner = ({
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
               ₹{" "}
-              {(
-                finance?.total_fixed_expenses + totalCurrentExpenses
-              ).toLocaleString("en-IN")}
+              {finance
+                ? (
+                    finance?.total_fixed_expenses + totalCurrentExpenses
+                  ).toLocaleString("en-IN")
+                : 0}
             </p>
           </div>
         </div>

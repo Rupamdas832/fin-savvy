@@ -69,7 +69,7 @@ model Finance {
 
 model Expenses {
   expense_id String @id @default(uuid())
-  user_id String @unique
+  user_id String
   user User @relation(fields: [user_id], references: [user_id])
   description String
   expense_category_id String

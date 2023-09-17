@@ -12,25 +12,29 @@ import { useEffect, useState } from "react";
 const Dashboard = () => {
   const [user, setUser] = useState<UserType | null>(null);
   const [finance, setFinance] = useState<FinanceType | null>(null);
-  const [expenses, setExpenses] = useState<ExpenseType[] | null>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [expenses, setExpenses] = useState<ExpenseType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
-    const userApi = () => axiosInstance.get("/api/users");
     const financeApi = () => axiosInstance.get("/api/finances");
     const expensesApi = () => axiosInstance.get("/api/expenses");
 
     try {
-      setIsLoading(true);
-      const response: any = await Promise.all([
-        userApi(),
-        financeApi(),
-        expensesApi(),
-      ]);
+      const response: any = await Promise.all([financeApi(), expensesApi()]);
       if (response.length > 0) {
-        setUser(response[0].data);
-        setFinance(response[1].data);
-        setExpenses(response[2].data);
+        setFinance(response[0].data);
+        setExpenses(response[1].data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const { data, status } = await axiosInstance.get("/api/users");
+      if (status === 200) {
+        setUser(data);
       }
     } catch (error) {
       console.log(error);
@@ -43,13 +47,17 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   return (
     <Layout>
       {isLoading ? (
         <div className="flex items-center justify-center w-full h-screen">
           <p>Loading...</p>
         </div>
-      ) : user && finance && expenses ? (
+      ) : user ? (
         <div className="flex flex-col w-full">
           <DashboardHeroBanner
             user={user}

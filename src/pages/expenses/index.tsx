@@ -71,6 +71,7 @@ const Expenses = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
+  const [isCreateError, setIsCreateError] = useState(null);
 
   const fetchInitData = async () => {
     try {
@@ -92,6 +93,7 @@ const Expenses = () => {
   }, []);
 
   const postNewExpense = async (payload: ExpenseType) => {
+    setIsCreateError(null);
     try {
       setIsSaving(true);
       const { data, status } = await axiosInstance.post("/api/expenses", {
@@ -99,11 +101,12 @@ const Expenses = () => {
       });
       if (status === 200) {
         setExpenseList((expenseList) => [...expenseList, data]);
+        handleResetModal();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setIsCreateError(error.message);
     } finally {
-      handleResetModal();
       setIsSaving(false);
     }
   };
@@ -264,6 +267,11 @@ const Expenses = () => {
                       isDisabled={isSaving}
                     />
                   </div>
+                  {isCreateError && (
+                    <p className="mt-2 p-2 bg-red-400 rounded-md">
+                      {isCreateError}
+                    </p>
+                  )}
                 </div>
               </Modal>
             )}

@@ -11,13 +11,14 @@ import { FinanceType } from "@/types/finance.type";
 
 interface OverviewBannerProps {
   user_id: string;
-  finance: FinanceType;
+  finance: FinanceType | null;
 }
 
 const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
   const router = useRouter();
 
   const getPercentage = () => {
+    if (!finance) return 0;
     const p =
       ((finance?.bank_balance + finance?.fd_balance) /
         finance?.emergency_fund) *
@@ -60,7 +61,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
 
   const getDebtScore = useMemo(() => {
     let score = 1;
-    const load = finance?.emi_load;
+    const load = finance ? finance?.emi_load : 0;
     const arr = [20, 40, 60, 80, 100];
     if (load < 20) {
       score = 5;

@@ -38,13 +38,12 @@ const DebtDiagnosis = () => {
   const [emi, setEMI] = useState(0);
   const [totalSavings, setTotalSavings] = useState(0);
   const [emiLoad, setEmiLoad] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   const fetchInitData = async () => {
     try {
-      setIsLoading(true);
       const { data, status } = await axiosInstance.get(
         "/api/finances/debt-diagnosis"
       );

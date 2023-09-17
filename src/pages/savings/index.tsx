@@ -25,13 +25,12 @@ const Savings = () => {
   const [equityBalance, setEquityBalance] = useState(0);
   const [goldBalance, setGoldBalance] = useState(0);
   const [totalSavings, setTotalSavings] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
-      setIsLoading(true);
       const { data, status } = await axiosInstance.get("/api/finances/savings");
       if (status === 200) {
         setBankBalance(data?.bank_balance);
