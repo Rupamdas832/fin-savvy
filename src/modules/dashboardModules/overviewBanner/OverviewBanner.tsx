@@ -75,6 +75,22 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
     return score;
   }, [finance]);
 
+  const getTaxScore = useMemo(() => {
+    let score = 0;
+    if (finance) {
+      if (finance.required_80C_investment <= 0) {
+        score += 1;
+      }
+      if (finance.required_80D_investment <= 0) {
+        score += 1;
+      }
+      if (finance.required_80CCD_investment <= 0) {
+        score += 1;
+      }
+    }
+    return score;
+  }, [finance]);
+
   return (
     <div className="flex flex-col p-4 bg-white rounded-t-2xl text-black">
       <p className="text-base font-bold">Statistics</p>
@@ -126,7 +142,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
             <p className="text-sm">Tax Saving</p>
           </div>
           <div>
-            <p className="text-sm font-bold">3/5</p>
+            <p className="text-sm font-bold">{getTaxScore}/3</p>
           </div>
         </div>
       </div>

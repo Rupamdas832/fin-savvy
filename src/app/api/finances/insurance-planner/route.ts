@@ -75,54 +75,60 @@ export async function GET(request: any) {
 }
 
 export async function PUT(req: any) {
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
-
   const requestBody = await req.json();
 
   try {
     const validatedReq = InsuranceSchema.parse(requestBody);
-
-    if (userId) {
-      const requiredData = await prisma.finance.findFirst({
-        where: {
-          user_id: {
-            equals: userId,
-          },
-        },
-      });
-      if (!requiredData)
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-      const calculatedData = {
-        required__life_insurance_cover:
-          (requiredData.monthly_income > 0
-            ? requiredData.monthly_income * 12 * 10
-            : validatedReq.monthly_income * 12 * 10) +
-          requiredData.total_loan_amount,
-        required_critical_illness_cover: 3000000,
-        required_accidental_death_cover: requiredData.monthly_income * 12 * 5,
-        required_health_insurance_cover: 500000,
-      };
-
-      const updatedData = {
-        ...requiredData,
-        ...validatedReq,
-        ...calculatedData,
-      };
-      const res = await prisma.finance.update({
-        where: {
-          user_id: userId,
-        },
-        data: updatedData,
-      });
-
-      return NextResponse.json({ ...calculatedData });
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
     }
-    return NextResponse.json(
-      { message: "Please provide user id" },
-      { status: 400 }
-    );
+
+    const verifiedTokenData = await verify(token);
+    if (!verifiedTokenData) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const requiredData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredData)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const calculatedData = {
+      required__life_insurance_cover:
+        (requiredData.monthly_income > 0
+          ? requiredData.monthly_income * 12 * 10
+          : validatedReq.monthly_income * 12 * 10) +
+        requiredData.total_loan_amount,
+      required_critical_illness_cover: 3000000,
+      required_accidental_death_cover: requiredData.monthly_income * 12 * 5,
+      required_health_insurance_cover: 500000,
+    };
+
+    const updatedData = {
+      ...requiredData,
+      ...validatedReq,
+      ...calculatedData,
+    };
+    const res = await prisma.finance.update({
+      where: {
+        user_id: String(verifiedTokenData.payload.userId),
+      },
+      data: updatedData,
+    });
+
+    return NextResponse.json({ ...calculatedData });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();

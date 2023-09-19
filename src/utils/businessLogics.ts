@@ -1,3 +1,5 @@
+import { TaxSavingType } from "@/types/finance.type";
+
 interface CalculateEmergencyFundProps {
   total_fixed_expenses: number;
   monthly_income: number;
@@ -35,4 +37,28 @@ export const calculateLoanAmountOfMonthlyEmi = (
     (monthlyEMI * (powerValue - 1)) / ((monthlyInterest * powerValue) / 100);
 
   return Number(result.toFixed(0));
+};
+
+export const calculateTaxBenefit = (payload: TaxSavingType) => {
+  const required_80C_investment =
+    150000 -
+    (payload.monthly_epf + payload.elss_investment) * 12 -
+    payload.life_insurance_premium;
+  const required_80D_investment =
+    (payload.is_user_age_above_sixty
+      ? 50000 - payload.health_insurance_premium
+      : 25000 - payload.health_insurance_premium) +
+    (payload.is_parents_age_above_sixty
+      ? 50000 - payload.parents_health_insurance_premium
+      : 25000 - payload.parents_health_insurance_premium);
+  const required_80CCD_investment = 50000 - payload.nps_investment;
+
+  return {
+    required_80C_investment:
+      required_80C_investment > 0 ? required_80C_investment : 0,
+    required_80D_investment:
+      required_80D_investment > 0 ? required_80D_investment : 0,
+    required_80CCD_investment:
+      required_80CCD_investment > 0 ? required_80CCD_investment : 0,
+  };
 };

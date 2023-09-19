@@ -39,6 +39,20 @@ export type DebtType = {
   emi_load: number;
 };
 
+export type TaxSavingType = {
+  monthly_epf: number;
+  life_insurance_premium: number;
+  elss_investment: number;
+  health_insurance_premium: number;
+  parents_health_insurance_premium: number;
+  is_user_age_above_sixty: boolean;
+  is_parents_age_above_sixty: boolean;
+  nps_investment: number;
+  required_80C_investment?: number;
+  required_80D_investment?: number;
+  required_80CCD_investment?: number;
+};
+
 export type FinanceType = {
   user_finance_id: string;
   user_id: string;
