@@ -262,36 +262,41 @@ const Expenses = () => {
                 No expenses for the month!
               </p>
             )}
-            <div className="flex flex-col-reverse mt-4">
-              {expenseList.map((expense) => {
-                const category = getCategory(expense.expense_category_id);
-                return (
-                  <div
-                    className="flex justify-between w-full p-2 mt-2 rounded-xl"
-                    key={expense.expense_id}
-                    onClick={() => handleExpenseClick(expense)}
-                  >
-                    <div className="flex items-center w-3/5">
-                      <LogoBadge
-                        logo={category?.logo}
-                        color={category?.color}
-                      />
-                      <div className="flex flex-col flex-1 ml-2">
-                        <p className="text-base font-bold">
-                          {expense.description}
+            <div className="flex flex-col mt-4">
+              {expenseList
+                .sort(
+                  // @ts-ignore
+                  (a, b) => new Date(b.expense_date) - new Date(a.expense_date)
+                )
+                .map((expense) => {
+                  const category = getCategory(expense.expense_category_id);
+                  return (
+                    <div
+                      className="flex justify-between w-full p-2 mt-2 rounded-xl"
+                      key={expense.expense_id}
+                      onClick={() => handleExpenseClick(expense)}
+                    >
+                      <div className="flex items-center w-3/5">
+                        <LogoBadge
+                          logo={category?.logo}
+                          color={category?.color}
+                        />
+                        <div className="flex flex-col flex-1 ml-2">
+                          <p className="text-base font-bold">
+                            {expense.description}
+                          </p>
+                          <p className="text-sm">{category?.title}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <p className="text-sm font-bold">₹ {expense.amount}</p>
+                        <p className="text-sm">
+                          {dayjs(expense.expense_date).format("DD-MMM-YYYY")}
                         </p>
-                        <p className="text-sm">{category?.title}</p>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <p className="text-sm font-bold">₹ {expense.amount}</p>
-                      <p className="text-sm">
-                        {dayjs(expense.expense_date).format("DD-MMM-YYYY")}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
             {isModalOpen && (
               <Modal title="Add expense" onClose={handleResetModal}>
