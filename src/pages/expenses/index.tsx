@@ -8,6 +8,7 @@ import { faChampagneGlasses } from "@fortawesome/free-solid-svg-icons";
 import { faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faReceipt } from "@fortawesome/free-solid-svg-icons";
+import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useMemo, useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import dayjs from "dayjs";
@@ -54,6 +55,12 @@ const expenseCategory = [
     logo: faReceipt,
     color: "bg-yellow-300",
   },
+  {
+    expense_category_id: "7",
+    title: "Entertainment",
+    logo: faFilm,
+    color: "bg-emerald-300",
+  },
 ];
 
 const getCategory = (id: string) => {
@@ -75,11 +82,15 @@ const Expenses = () => {
   const [isError, setIsError] = useState<string | null>(null);
   const [isCreateError, setIsCreateError] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString());
 
   const fetchInitData = async () => {
     try {
       setIsLoading(true);
-      const { data, status } = await axiosInstance.get("/api/expenses");
+      const selectedMonthArray = selectedMonth.split("-");
+      const { data, status } = await axiosInstance.get(
+        `/api/expenses/?month=${selectedMonthArray[1]}&year=${selectedMonthArray[0]}`
+      );
       if (status === 200) {
         setExpenseList(data);
       }
@@ -93,7 +104,7 @@ const Expenses = () => {
 
   useEffect(() => {
     fetchInitData();
-  }, []);
+  }, [selectedMonth]);
 
   const postNewExpense = async (payload: ExpenseType) => {
     setIsCreateError(null);
@@ -164,7 +175,7 @@ const Expenses = () => {
         description: title,
         expense_category_id: expenseCategoryId,
         amount,
-        expense_date: createdAt,
+        expense_date: new Date(createdAt).toISOString(),
         expense_id: isEdit ? expenseId : undefined,
       };
       if (isEdit) {
@@ -238,9 +249,17 @@ const Expenses = () => {
                 />
               </button>
             </div>
+            <div className="mt-2">
+              <input
+                className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
+                type="month"
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                value={dayjs(selectedMonth).format("YYYY-MM")}
+              />
+            </div>
             {expenseList.length === 0 && (
               <p className="text-xl font-bold text-center mt-8">
-                No expenses yet!
+                No expenses for the month!
               </p>
             )}
             <div className="flex flex-col-reverse mt-4">

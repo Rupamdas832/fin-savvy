@@ -6,11 +6,11 @@ export const prisma = new PrismaClient({
 });
 
 // Print the SQL query to console for learning
-prisma.$on("query", (e) => {
-  console.log("Query: " + e.query);
-  console.log("Params: " + e.params);
-  console.log("Duration: " + e.duration + "ms");
-});
+// prisma.$on("query", (e) => {
+//   console.log("Query: " + e.query);
+//   console.log("Params: " + e.params);
+//   console.log("Duration: " + e.duration + "ms");
+// });
 
 async function main() {
   // we will write prisma commands

@@ -21,7 +21,16 @@ const DeleteExpenseSchema = z.object({
   expense_id: z.string(),
 });
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const currentMonth = new Date().toISOString().split("-");
+  const month = searchParams.get("month")
+    ? Number(searchParams.get("month"))
+    : Number(currentMonth[1]);
+  const year = searchParams.get("year")
+    ? Number(searchParams.get("year"))
+    : Number(currentMonth[0]);
+
   try {
     const cookieStore = cookies();
     const token = cookieStore.get("token")?.value;
@@ -41,9 +50,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (verifiedTokenData.payload?.userId) {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const requiredData = await prisma.expenses.findMany({
         where: {
           user_id: { equals: String(verifiedTokenData.payload.userId) },
+          expense_date: {
+            gte: startDate,
+            lt: endDate,
+          },
         },
       });
 
