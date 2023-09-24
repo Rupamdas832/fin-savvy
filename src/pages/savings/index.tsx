@@ -22,6 +22,7 @@ const tipsListEmergencyFund = [
 const Savings = () => {
   const [bankBalance, setBankBalance] = useState(0);
   const [fdBalance, setFDBalance] = useState(0);
+  const [liquidBalance, setLiquidBalance] = useState(0);
   const [equityBalance, setEquityBalance] = useState(0);
   const [goldBalance, setGoldBalance] = useState(0);
   const [totalSavings, setTotalSavings] = useState(0);
@@ -38,6 +39,7 @@ const Savings = () => {
         setEquityBalance(data?.equity_balance);
         setGoldBalance(data?.gold_balance);
         setTotalSavings(data?.total_savings);
+        setLiquidBalance(data?.liquid_mf_balance);
       }
     } catch (error: any) {
       console.log(error);
@@ -71,7 +73,8 @@ const Savings = () => {
   };
 
   const handleCalculateClick = () => {
-    const total_savings = bankBalance + fdBalance + equityBalance + goldBalance;
+    const total_savings =
+      bankBalance + fdBalance + equityBalance + goldBalance + liquidBalance;
 
     const newSavings: SavingType = {
       bank_balance: bankBalance,
@@ -79,6 +82,7 @@ const Savings = () => {
       equity_balance: equityBalance,
       gold_balance: goldBalance,
       total_savings: total_savings,
+      liquid_mf_balance: liquidBalance,
     };
     updateSavingsApi(newSavings);
   };
@@ -125,6 +129,19 @@ const Savings = () => {
                 type="number"
                 onChange={(e) => setFDBalance(Number(e.target.value))}
                 value={fdBalance?.toString()}
+              />
+            </div>
+            <div className="flex flex-col mt-4">
+              <label className="font-bold">
+                Liquid mutual fund balance is{" "}
+                <span className="text-gray-400">Rs.</span>
+              </label>
+              <input
+                placeholder="200000"
+                className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
+                type="number"
+                onChange={(e) => setLiquidBalance(Number(e.target.value))}
+                value={liquidBalance?.toString()}
               />
             </div>
             <div className="flex flex-col mt-4">

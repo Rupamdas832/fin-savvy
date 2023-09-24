@@ -11,6 +11,7 @@ const SavingsSchema = z.object({
   fd_balance: z.number(),
   equity_balance: z.number(),
   gold_balance: z.number(),
+  liquid_mf_balance: z.number(),
   total_savings: z.number(),
 });
 
@@ -47,6 +48,7 @@ export async function GET(request: any) {
       fd_balance: requiredData.fd_balance,
       equity_balance: requiredData.equity_balance,
       gold_balance: requiredData.gold_balance,
+      liquid_mf_balance: requiredData.liquid_mf_balance,
       total_savings: requiredData.total_savings,
     };
     return NextResponse.json(savings);

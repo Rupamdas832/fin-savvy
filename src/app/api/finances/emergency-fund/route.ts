@@ -43,7 +43,7 @@ export async function GET(request: any) {
       emergency_fund: requiredData?.emergency_fund,
       monthly_income: requiredData?.monthly_income,
       job_stability: requiredData?.job_stability,
-      savings: requiredData?.bank_balance + requiredData?.fd_balance,
+      savings: requiredData?.bank_balance + requiredData?.liquid_mf_balance,
       total_fixed_expenses: requiredData?.total_fixed_expenses,
     };
 

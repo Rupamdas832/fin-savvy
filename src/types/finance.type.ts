@@ -15,6 +15,7 @@ export type SavingType = {
   fd_balance: number;
   equity_balance: number;
   gold_balance: number;
+  liquid_mf_balance: number;
   total_savings: number;
 };
 
@@ -67,6 +68,7 @@ export type FinanceType = {
   total_fixed_expenses: number;
   bank_balance: number;
   fd_balance: number;
+  liquid_mf_balance: number;
   equity_balance: number;
   gold_balance: number;
   total_savings: number;

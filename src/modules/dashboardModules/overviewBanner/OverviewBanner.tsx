@@ -20,7 +20,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
   const getPercentage = () => {
     if (!finance) return 0;
     const p =
-      ((finance?.bank_balance + finance?.fd_balance) /
+      ((finance?.bank_balance + finance?.liquid_mf_balance) /
         finance?.emergency_fund) *
       100;
     return p.toFixed();

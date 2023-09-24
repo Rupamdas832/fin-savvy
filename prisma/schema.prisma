@@ -39,6 +39,7 @@ model Finance {
   fd_balance Int @default(0)
   equity_balance Int @default(0)
   gold_balance Int @default(0)
+  liquid_mf_balance Int @default(0)
   total_savings Int @default(0)
   life_insurance_cover Int @default(0)
   critical_illness_cover Int @default(0)
