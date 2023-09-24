@@ -324,7 +324,7 @@ const Expenses = () => {
                           .map((category) => {
                             return (
                               <div
-                                className="flex items-center mt-2 py-1"
+                                className="flex items-center mt-3"
                                 key={category.expense_category_id}
                               >
                                 <LogoBadge
@@ -334,7 +334,7 @@ const Expenses = () => {
                                 <div className="flex flex-1 flex-col pl-2">
                                   <p>{category.title}</p>
                                   <p
-                                    className={`${category.color} rounded-xl p-1 px-2 text-right`}
+                                    className={`${category.color} rounded-xl px-2 text-right`}
                                     style={{
                                       width: `${
                                         getPercentage(
