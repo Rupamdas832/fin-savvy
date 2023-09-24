@@ -117,7 +117,7 @@ const EmergencyFund = () => {
             </div>
             <div className="flex flex-col mt-4">
               <label className="font-bold">
-                My bank balance + FD is{" "}
+                My bank balance + Liquid fund balance is{" "}
                 <span className="text-gray-400">Rs.</span>
               </label>
               <input
