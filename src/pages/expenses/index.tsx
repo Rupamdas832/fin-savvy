@@ -9,7 +9,7 @@ import { faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faReceipt } from "@fortawesome/free-solid-svg-icons";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +17,12 @@ import Modal from "@/components/modal/Modal";
 import { useRouter } from "next/router";
 import { axiosInstance } from "@/api/api";
 import { ExpenseType } from "@/types/expenses.type";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/tabs/Tabs";
 
 const expenseCategory = [
   {
@@ -53,13 +59,19 @@ const expenseCategory = [
     expense_category_id: "6",
     title: "Bills",
     logo: faReceipt,
-    color: "bg-yellow-300",
+    color: "bg-teal-300",
   },
   {
     expense_category_id: "7",
     title: "Entertainment",
     logo: faFilm,
     color: "bg-emerald-300",
+  },
+  {
+    expense_category_id: "8",
+    title: "Home Improvement",
+    logo: faFilm,
+    color: "bg-orange-300",
   },
 ];
 
@@ -83,6 +95,7 @@ const Expenses = () => {
   const [isCreateError, setIsCreateError] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString());
+  const [activeTab, setActiveTab] = useState<"SUMMARY" | "DETAILS">("SUMMARY");
 
   const fetchInitData = async () => {
     try {
@@ -211,6 +224,28 @@ const Expenses = () => {
     return expenseList.reduce((accu, curr) => accu + curr.amount, 0);
   }, [expenseList]);
 
+  const getExpenseCategoryWise = useCallback(() => {
+    const newArray = expenseCategory.map((category) => {
+      const totalAmount = expenseList
+        .filter(
+          (expense) =>
+            expense.expense_category_id === category.expense_category_id
+        )
+        .reduce((accu, curr) => accu + curr.amount, 0);
+
+      const newObj = {
+        ...category,
+        total_amount: totalAmount,
+      };
+      return newObj;
+    });
+    return newArray;
+  }, [expenseList]);
+
+  const getPercentage = (value: number, total: number) => {
+    return (value * 100) / total;
+  };
+
   return (
     <Layout>
       <div className="flex flex-col w-full min-h-screen bg-white text-black">
@@ -230,7 +265,7 @@ const Expenses = () => {
                 onClick={() => router.push("/expenses/fixed")}
               />
             </div>
-            <p className="text-sm  mt-2">
+            <p className="text-sm mt-2">
               Total: ₹{" "}
               <span className="text-base font-bold">{totalExpense}</span>
             </p>
@@ -262,41 +297,122 @@ const Expenses = () => {
                 No expenses for the month!
               </p>
             )}
-            <div className="flex flex-col mt-4">
-              {expenseList
-                .sort(
-                  // @ts-ignore
-                  (a, b) => new Date(b.expense_date) - new Date(a.expense_date)
-                )
-                .map((expense) => {
-                  const category = getCategory(expense.expense_category_id);
-                  return (
-                    <div
-                      className="flex justify-between w-full p-2 mt-2 rounded-xl"
-                      key={expense.expense_id}
-                      onClick={() => handleExpenseClick(expense)}
-                    >
-                      <div className="flex items-center w-3/5">
-                        <LogoBadge
-                          logo={category?.logo}
-                          color={category?.color}
-                        />
-                        <div className="flex flex-col flex-1 ml-2">
-                          <p className="text-base font-bold">
-                            {expense.description}
-                          </p>
-                          <p className="text-sm">{category?.title}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <p className="text-sm font-bold">₹ {expense.amount}</p>
-                        <p className="text-sm">
-                          {dayjs(expense.expense_date).format("DD-MMM-YYYY")}
-                        </p>
-                      </div>
+            <div className="mt-2">
+              <Tabs>
+                <TabsList>
+                  <TabsTrigger
+                    value="SUMMARY"
+                    onClick={() => setActiveTab("SUMMARY")}
+                    activeTab={activeTab}
+                  >
+                    Summary
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="DETAILS"
+                    onClick={() => setActiveTab("DETAILS")}
+                    activeTab={activeTab}
+                  >
+                    Details
+                  </TabsTrigger>
+                </TabsList>
+                {activeTab === "SUMMARY" && (
+                  <TabsContent value="SUMMARY">
+                    <div>
+                      {getExpenseCategoryWise()
+                        .sort((a, b) => b.total_amount - a.total_amount)
+                        .map((category) => {
+                          return (
+                            <div
+                              className="flex items-center mt-2 py-1"
+                              key={category.expense_category_id}
+                            >
+                              <LogoBadge
+                                logo={category?.logo}
+                                color={category?.color}
+                              />
+                              <div className="flex flex-1 flex-col pl-2">
+                                <p>{category.title}</p>
+                                <p
+                                  className={`${category.color} rounded-xl p-1 px-2 text-right`}
+                                  style={{
+                                    width: `${
+                                      getPercentage(
+                                        category.total_amount,
+                                        totalExpense
+                                      ) +
+                                      (getPercentage(
+                                        category.total_amount,
+                                        totalExpense
+                                      ) > 80
+                                        ? 0
+                                        : 20)
+                                    }%`,
+                                  }}
+                                >
+                                  {getPercentage(
+                                    category.total_amount,
+                                    totalExpense
+                                  ).toFixed(0)}
+                                  %
+                                </p>
+                              </div>
+                              <div className="w-16 text-right text-sm font-bold">
+                                ₹ {category.total_amount}
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
-                  );
-                })}
+                  </TabsContent>
+                )}
+                {activeTab === "DETAILS" && (
+                  <TabsContent value="DETAILS">
+                    <div className="flex flex-col">
+                      {expenseList
+                        .sort(
+                          (a, b) =>
+                            // @ts-ignore
+                            new Date(b.expense_date) - new Date(a.expense_date)
+                        )
+                        .map((expense) => {
+                          const category = getCategory(
+                            expense.expense_category_id
+                          );
+                          return (
+                            <div
+                              className="flex justify-between w-full py-2 mt-2 rounded-xl"
+                              key={expense.expense_id}
+                              onClick={() => handleExpenseClick(expense)}
+                            >
+                              <div className="flex items-center w-3/5">
+                                <LogoBadge
+                                  logo={category?.logo}
+                                  color={category?.color}
+                                />
+                                <div className="flex flex-col flex-1 ml-2">
+                                  <p className="text-base font-bold">
+                                    {expense.description}
+                                  </p>
+                                  <p className="text-sm">{category?.title}</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                <p className="text-sm font-bold">
+                                  ₹ {expense.amount}
+                                </p>
+                                <p className="text-sm">
+                                  {dayjs(expense.expense_date).format(
+                                    "DD-MMM-YYYY"
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </TabsContent>
+                )}
+              </Tabs>
             </div>
             {isModalOpen && (
               <Modal title="Add expense" onClose={handleResetModal}>
