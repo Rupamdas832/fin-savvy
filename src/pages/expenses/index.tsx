@@ -297,123 +297,127 @@ const Expenses = () => {
                 No expenses for the month!
               </p>
             )}
-            <div className="mt-2">
-              <Tabs>
-                <TabsList>
-                  <TabsTrigger
-                    value="SUMMARY"
-                    onClick={() => setActiveTab("SUMMARY")}
-                    activeTab={activeTab}
-                  >
-                    Summary
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="DETAILS"
-                    onClick={() => setActiveTab("DETAILS")}
-                    activeTab={activeTab}
-                  >
-                    Details
-                  </TabsTrigger>
-                </TabsList>
-                {activeTab === "SUMMARY" && (
-                  <TabsContent value="SUMMARY">
-                    <div>
-                      {getExpenseCategoryWise()
-                        .sort((a, b) => b.total_amount - a.total_amount)
-                        .map((category) => {
-                          return (
-                            <div
-                              className="flex items-center mt-2 py-1"
-                              key={category.expense_category_id}
-                            >
-                              <LogoBadge
-                                logo={category?.logo}
-                                color={category?.color}
-                              />
-                              <div className="flex flex-1 flex-col pl-2">
-                                <p>{category.title}</p>
-                                <p
-                                  className={`${category.color} rounded-xl p-1 px-2 text-right`}
-                                  style={{
-                                    width: `${
-                                      getPercentage(
-                                        category.total_amount,
-                                        totalExpense
-                                      ) +
-                                      (getPercentage(
-                                        category.total_amount,
-                                        totalExpense
-                                      ) > 80
-                                        ? 0
-                                        : 20)
-                                    }%`,
-                                  }}
-                                >
-                                  {getPercentage(
-                                    category.total_amount,
-                                    totalExpense
-                                  ).toFixed(0)}
-                                  %
-                                </p>
-                              </div>
-                              <div className="w-16 text-right text-sm font-bold">
-                                ₹ {category.total_amount}
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </TabsContent>
-                )}
-                {activeTab === "DETAILS" && (
-                  <TabsContent value="DETAILS">
-                    <div className="flex flex-col">
-                      {expenseList
-                        .sort(
-                          (a, b) =>
-                            // @ts-ignore
-                            new Date(b.expense_date) - new Date(a.expense_date)
-                        )
-                        .map((expense) => {
-                          const category = getCategory(
-                            expense.expense_category_id
-                          );
-                          return (
-                            <div
-                              className="flex justify-between w-full py-2 mt-2 rounded-xl"
-                              key={expense.expense_id}
-                              onClick={() => handleExpenseClick(expense)}
-                            >
-                              <div className="flex items-center w-3/5">
+            {expenseList.length > 0 && (
+              <div className="mt-2">
+                <Tabs>
+                  <TabsList>
+                    <TabsTrigger
+                      value="SUMMARY"
+                      onClick={() => setActiveTab("SUMMARY")}
+                      activeTab={activeTab}
+                    >
+                      Summary
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="DETAILS"
+                      onClick={() => setActiveTab("DETAILS")}
+                      activeTab={activeTab}
+                    >
+                      Details
+                    </TabsTrigger>
+                  </TabsList>
+                  {activeTab === "SUMMARY" && (
+                    <TabsContent value="SUMMARY">
+                      <div>
+                        {getExpenseCategoryWise()
+                          .sort((a, b) => b.total_amount - a.total_amount)
+                          .map((category) => {
+                            return (
+                              <div
+                                className="flex items-center mt-2 py-1"
+                                key={category.expense_category_id}
+                              >
                                 <LogoBadge
                                   logo={category?.logo}
                                   color={category?.color}
                                 />
-                                <div className="flex flex-col flex-1 ml-2">
-                                  <p className="text-base font-bold">
-                                    {expense.description}
+                                <div className="flex flex-1 flex-col pl-2">
+                                  <p>{category.title}</p>
+                                  <p
+                                    className={`${category.color} rounded-xl p-1 px-2 text-right`}
+                                    style={{
+                                      width: `${
+                                        getPercentage(
+                                          category.total_amount,
+                                          totalExpense
+                                        ) +
+                                        (getPercentage(
+                                          category.total_amount,
+                                          totalExpense
+                                        ) > 80
+                                          ? 0
+                                          : 20)
+                                      }%`,
+                                    }}
+                                  >
+                                    {getPercentage(
+                                      category.total_amount,
+                                      totalExpense
+                                    ).toFixed(0)}
+                                    %
                                   </p>
-                                  <p className="text-sm">{category?.title}</p>
+                                </div>
+                                <div className="w-16 text-right text-sm font-bold">
+                                  ₹ {category.total_amount}
                                 </div>
                               </div>
-                              <div className="flex flex-col items-end">
-                                <p className="text-sm font-bold">
-                                  ₹ {expense.amount}
-                                </p>
-                                <p className="text-sm">
-                                  {dayjs(expense.expense_date).format(
-                                    "DD-MMM-YYYY"
-                                  )}
-                                </p>
+                            );
+                          })}
+                      </div>
+                    </TabsContent>
+                  )}
+                  {activeTab === "DETAILS" && (
+                    <TabsContent value="DETAILS">
+                      <div className="flex flex-col">
+                        {expenseList
+                          .sort(
+                            (a, b) =>
+                              // @ts-ignore
+                              new Date(b.expense_date) -
+                              // @ts-ignore
+                              new Date(a.expense_date)
+                          )
+                          .map((expense) => {
+                            const category = getCategory(
+                              expense.expense_category_id
+                            );
+                            return (
+                              <div
+                                className="flex justify-between w-full py-2 mt-2 rounded-xl"
+                                key={expense.expense_id}
+                                onClick={() => handleExpenseClick(expense)}
+                              >
+                                <div className="flex items-center w-3/5">
+                                  <LogoBadge
+                                    logo={category?.logo}
+                                    color={category?.color}
+                                  />
+                                  <div className="flex flex-col flex-1 ml-2">
+                                    <p className="text-base font-bold">
+                                      {expense.description}
+                                    </p>
+                                    <p className="text-sm">{category?.title}</p>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                  <p className="text-sm font-bold">
+                                    ₹ {expense.amount}
+                                  </p>
+                                  <p className="text-sm">
+                                    {dayjs(expense.expense_date).format(
+                                      "DD-MMM-YYYY"
+                                    )}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </TabsContent>
-                )}
-              </Tabs>
-            </div>
+                            );
+                          })}
+                      </div>
+                    </TabsContent>
+                  )}
+                </Tabs>
+              </div>
+            )}
             {isModalOpen && (
               <Modal title="Add expense" onClose={handleResetModal}>
                 <div className="flex flex-col p-4 bg-white rounded-b-xl">
