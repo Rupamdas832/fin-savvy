@@ -4,10 +4,10 @@ import TipsCard from "@/components/tipsCard/TipsCard";
 import { calculateLoanAmountOfMonthlyEmi } from "@/utils/businessLogics";
 import { getNumberSystem } from "@/utils/general";
 import { faCarSide } from "@fortawesome/free-solid-svg-icons";
-import { useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 const tipsListCarPlanning = [
-  { id: 1, text: "Car EMI should be less than 20% of your monthly income." },
+  { id: 1, text: "Car EMI should be less than 15% of your monthly income." },
   {
     id: 2,
     text: "Pay atleast 20% of your car total price as downpayment.",
@@ -19,10 +19,18 @@ const Car = () => {
   const [loanTenure, setLoanTenure] = useState(0);
   const [interest, setInterest] = useState(0);
 
-  const loanAmount = useMemo(() => {
-    if (!monthlyEMI || !loanTenure || !interest) return 0;
+  const loanAmount = useCallback(() => {
+    if (!monthlyEMI || !loanTenure || !interest)
+      return { loan: 0, downpayment: 0, total: 0 };
 
-    return calculateLoanAmountOfMonthlyEmi(interest, loanTenure, monthlyEMI);
+    const loan = calculateLoanAmountOfMonthlyEmi(
+      interest,
+      loanTenure,
+      monthlyEMI
+    );
+    const downpayment = (loan * 0.2) / 0.8;
+    const total = loan + downpayment;
+    return { loan, downpayment, total };
   }, [monthlyEMI, loanTenure, interest]);
 
   return (
@@ -42,9 +50,13 @@ const Car = () => {
               <span className="text-gray-400">Rs.</span>
             </label>
             <div className="mt-4">
-              <p className="w-16 p-2 rounded-md border border-slate-700">
-                {monthlyEMI}
-              </p>
+              <input
+                className="w-16 p-2 rounded-md border border-slate-700"
+                value={monthlyEMI}
+                onChange={(e) => setMonthlyEMI(Number(e.target.value))}
+                min={0}
+                max={200000}
+              />
             </div>
             <input
               placeholder="50000"
@@ -90,9 +102,22 @@ const Car = () => {
             />
           </div>
           <div className="flex items-center mt-4">
-            <p className="w-56">Loan amount you can afford:</p>
+            <p className="w-56">Loan amount:</p>
+            <p className="flex flex-1 rounded-md bg-teal-100 p-2 font-bold">
+              ₹ {getNumberSystem(loanAmount().loan)}
+            </p>
+          </div>
+          <div className="flex items-center mt-4">
+            <p className="w-56">Recomended downpayment:</p>
+            <p className="flex flex-1 rounded-md bg-teal-100 p-2 font-bold">
+              ₹ {getNumberSystem(loanAmount().downpayment)}
+            </p>
+          </div>
+          <div className="mt-2 border border-t-0 border-slate-400"></div>
+          <div className="flex items-center mt-2">
+            <p className="w-56">Car amount you can afford:</p>
             <p className="flex flex-1 rounded-md bg-teal-400 p-2 font-bold">
-              ₹ {getNumberSystem(loanAmount)}
+              ₹ {getNumberSystem(loanAmount().total)}
             </p>
           </div>
           <TipsCard list={tipsListCarPlanning} />
