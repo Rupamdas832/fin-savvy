@@ -18,7 +18,7 @@ interface TabsContentProps {
 }
 
 export const Tabs = (props: TabsProps) => {
-  return <div className="flex flex-col p-2">{props.children}</div>;
+  return <div className="flex flex-col w-full">{props.children}</div>;
 };
 
 export const TabsList = (props: TabsListProps) => {

@@ -117,8 +117,6 @@ const Expenses = () => {
     if (isLeftSwipe || isRightSwipe) {
       isLeftSwipe ? setActiveTab("DETAILS") : setActiveTab("SUMMARY");
     }
-    console.log("swipe", isLeftSwipe ? "left" : "right");
-    // add your conditional logic here
   };
 
   const fetchInitData = async () => {
@@ -280,7 +278,7 @@ const Expenses = () => {
             <p>Loading...</p>
           </div>
         ) : !isError ? (
-          <div className="flex flex-col p-4">
+          <div className="flex flex-col p-4 flex-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <p className="text-2xl font-bold mr-2">Expenses</p>
@@ -325,7 +323,7 @@ const Expenses = () => {
             )}
             {expenseList.length > 0 && (
               <div
-                className="mt-2"
+                className="mt-4 flex-1"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}

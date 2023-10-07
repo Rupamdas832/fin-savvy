@@ -20,6 +20,7 @@ model User {
   created_at DateTime @default(now())
   finance Finance?
   expense Expenses[]
+  investment Investments[]
 }
 
 model Finance {
@@ -76,5 +77,16 @@ model Expenses {
   expense_category_id String
   amount Int @default(0)
   expense_date DateTime
+  created_at DateTime @default(now())
+}
+
+model Investments {
+  investment_id String @id @default(uuid())
+  user_id String
+  user User @relation(fields: [user_id], references: [user_id])
+  description String
+  amount Int @default(0)
+  investment_category_id String
+  investment_date DateTime
   created_at DateTime @default(now())
 }
