@@ -39,19 +39,19 @@ const investmentCategory = [
     investment_category_id: "1",
     title: "Stocks",
     logo: faChartSimple,
-    color: "bg-lime-300",
+    color: "bg-blue-300",
   },
   {
     investment_category_id: "2",
     title: "Mutual Funds",
     logo: faArrowTrendUp,
-    color: "bg-pink-300",
+    color: "bg-lime-300",
   },
   {
     investment_category_id: "3",
     title: "Fintech apps",
     logo: faCreditCard,
-    color: "bg-blue-300",
+    color: "bg-pink-300",
   },
   {
     investment_category_id: "4",
