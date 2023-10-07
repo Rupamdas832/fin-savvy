@@ -96,6 +96,30 @@ const Expenses = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString());
   const [activeTab, setActiveTab] = useState<"SUMMARY" | "DETAILS">("SUMMARY");
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // the required distance between touchStart and touchEnd to be detected as a swipe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: any) => {
+    setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: any) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe || isRightSwipe) {
+      isLeftSwipe ? setActiveTab("DETAILS") : setActiveTab("SUMMARY");
+    }
+    console.log("swipe", isLeftSwipe ? "left" : "right");
+    // add your conditional logic here
+  };
 
   const fetchInitData = async () => {
     try {
@@ -188,7 +212,9 @@ const Expenses = () => {
         description: title,
         expense_category_id: expenseCategoryId,
         amount,
-        expense_date: new Date(createdAt).toISOString(),
+        expense_date: createdAt
+          ? new Date(createdAt).toISOString()
+          : new Date().toISOString(),
         expense_id: isEdit ? expenseId : undefined,
       };
       if (isEdit) {
@@ -298,7 +324,12 @@ const Expenses = () => {
               </p>
             )}
             {expenseList.length > 0 && (
-              <div className="mt-2">
+              <div
+                className="mt-2"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
                 <Tabs>
                   <TabsList>
                     <TabsTrigger
@@ -321,6 +352,7 @@ const Expenses = () => {
                       <div>
                         {getExpenseCategoryWise()
                           .sort((a, b) => b.total_amount - a.total_amount)
+                          .filter((item) => item.total_amount !== 0)
                           .map((category) => {
                             return (
                               <div
@@ -438,7 +470,7 @@ const Expenses = () => {
                       className="mt-2 border border-spacing-1 p-2 rounded-md border-slate-500"
                       type="number"
                       onChange={(e) => setAmount(Number(e.target.value))}
-                      value={amount}
+                      value={amount.toString()}
                     />
                   </div>
                   <div className="flex flex-col mt-2">
