@@ -66,7 +66,7 @@ const Dashboard = () => {
             expenses={expenses}
           />
           <div className="bg-white rounded-t-2xl">
-            <ChecklistBanner />
+            <ChecklistBanner finance={finance} />
           </div>
           <OverviewBanner user_id={user.user_id} finance={finance} />
           <GoalBanner />

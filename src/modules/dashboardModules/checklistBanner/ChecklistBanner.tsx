@@ -1,4 +1,5 @@
 import LogoBadge from "@/components/badge/LogoBadge";
+import { FinanceType } from "@/types/finance.type";
 import {
   faCircleDown,
   faShieldHalved,
@@ -9,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const initSteps = [
   {
@@ -18,7 +19,7 @@ const initSteps = [
     borderColor: "border-yellow-400",
     bgColor: "bg-yellow-400",
     logo: faSackDollar,
-    status: "DONE",
+    status: "PENDING",
   },
   {
     id: "2",
@@ -34,7 +35,7 @@ const initSteps = [
     borderColor: "border-green-400",
     bgColor: "bg-green-400",
     logo: faSackDollar,
-    status: "DONE",
+    status: "PENDING",
   },
   {
     id: "4",
@@ -62,9 +63,42 @@ const initSteps = [
   },
 ];
 
-const ChecklistBanner = () => {
+interface ChecklistBannerProps {
+  finance: FinanceType | null;
+}
+
+const ChecklistBanner = (props: ChecklistBannerProps) => {
+  const { finance } = props;
   const [steps, setSteps] = useState(initSteps);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!finance) return;
+    const newSteps = steps.map((item) => {
+      if (item.id === "1") {
+        item.status = finance.total_savings > 0 ? "DONE" : "PENDING";
+      }
+      if (item.id === "2") {
+        item.status = finance.total_fixed_expenses > 0 ? "DONE" : "PENDING";
+      }
+      if (item.id === "3") {
+        item.status = finance.emergency_fund > 0 ? "DONE" : "PENDING";
+      }
+      if (item.id === "4") {
+        item.status =
+          finance.required__life_insurance_cover > 0 ? "DONE" : "PENDING";
+      }
+      if (item.id === "5") {
+        item.status = finance.emi_load > 0 ? "DONE" : "PENDING";
+      }
+      if (item.id === "6") {
+        item.status = finance.required_80C_investment > 0 ? "DONE" : "PENDING";
+      }
+      return item;
+    });
+    setSteps(newSteps);
+  }, [finance]);
+
   return (
     <div className="flex flex-col p-4 text-black">
       <p className="text-base font-bold">
