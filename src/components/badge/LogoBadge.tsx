@@ -14,7 +14,7 @@ const LogoBadge = ({
     <div
       className={`flex items-center justify-center w-8 h-8 rounded-full ${color}`}
     >
-      <FontAwesomeIcon icon={logo} className="text-sm  text-black" />
+      <FontAwesomeIcon icon={logo} className="text-sm text-white" />
     </div>
   );
 };

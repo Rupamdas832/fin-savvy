@@ -8,6 +8,7 @@ import { axiosInstance, originUrl } from "@/api/api";
 import { FinanceType } from "@/types/finance.type";
 import { ExpenseType } from "@/types/expenses.type";
 import { useEffect, useState } from "react";
+import ChecklistBanner from "@/modules/dashboardModules/checklistBanner/ChecklistBanner";
 
 const Dashboard = () => {
   const [user, setUser] = useState<UserType | null>(null);
@@ -64,6 +65,9 @@ const Dashboard = () => {
             finance={finance}
             expenses={expenses}
           />
+          <div className="bg-white rounded-t-2xl">
+            <ChecklistBanner />
+          </div>
           <OverviewBanner user_id={user.user_id} finance={finance} />
           <GoalBanner />
         </div>

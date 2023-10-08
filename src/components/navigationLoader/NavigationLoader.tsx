@@ -39,7 +39,7 @@ export default function NavigationLoader() {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-80 text-white">
+    <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-80 text-white z-40">
       <Loader2 className="h-8 w-8 animate-spin" />
     </div>
   );

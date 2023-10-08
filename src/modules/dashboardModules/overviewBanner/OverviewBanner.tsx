@@ -92,7 +92,7 @@ const OverviewBanner = ({ user_id, finance }: OverviewBannerProps) => {
   }, [finance]);
 
   return (
-    <div className="flex flex-col p-4 bg-white rounded-t-2xl text-black">
+    <div className="flex flex-col p-4 bg-white text-black">
       <p className="text-base font-bold">Statistics</p>
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div
