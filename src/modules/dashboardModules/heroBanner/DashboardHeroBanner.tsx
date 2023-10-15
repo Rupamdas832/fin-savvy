@@ -42,7 +42,10 @@ const DashboardHeroBanner = ({
           </p>
         </div>
       </div>
-      <div className="flex justify-between gap-4 mt-4">
+      <div
+        className="flex justify-between gap-4 mt-4"
+        onClick={() => router.push("/income")}
+      >
         <div className="flex flex-1 items-center p-4 rounded-2xl bg-gray-800">
           <FontAwesomeIcon
             icon={faCircleUp}

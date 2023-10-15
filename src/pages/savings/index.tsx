@@ -153,6 +153,10 @@ const Savings = () => {
     fetchInvestmentListData();
   }, []);
 
+  useEffect(() => {
+    fetchInvestmentListData();
+  }, [selectedMonth]);
+
   const updateSavingsApi = async (payload: SavingType) => {
     try {
       setIsSaving(true);
@@ -436,6 +440,11 @@ const Savings = () => {
                         value={dayjs(selectedMonth).format("YYYY-MM")}
                       />
                     </div>
+                    {investmentList.length === 0 && (
+                      <p className="text-xl font-bold text-center mt-8">
+                        No investments for the month!
+                      </p>
+                    )}
                     {investmentList
                       .sort(
                         (a, b) =>
