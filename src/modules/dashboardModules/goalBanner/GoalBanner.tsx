@@ -22,7 +22,10 @@ const GoalBanner = () => {
             <p className="text-sm">Dream Car</p>
           </div>
         </div>
-        <div className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl">
+        <div
+          className="flex justify-between p-4 h-28 shadow-md shadow-slate-400 rounded-2xl"
+          onClick={() => router.push("/goals/vacation")}
+        >
           <div className="flex flex-col justify-between items-start">
             <LogoBadge logo={faPlane} color="bg-fuchsia-400" />
             <p className="text-sm">Vacation Planning</p>
