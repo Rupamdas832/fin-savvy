@@ -12,6 +12,10 @@ const tipsListCarPlanning = [
     id: 2,
     text: "Pay atleast 20% of your car total price as downpayment.",
   },
+  {
+    id: 3,
+    text: "Try keeping your loan tenure equal to or below 5yrs.",
+  },
 ];
 
 const Car = () => {
