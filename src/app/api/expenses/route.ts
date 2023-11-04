@@ -133,7 +133,7 @@ export async function POST(req: any) {
       bank_balance: requiredFinanceData.bank_balance - validatedReq.amount,
       total_savings: requiredFinanceData.total_savings - validatedReq.amount,
     };
-    const response = await prisma.finance.update({
+    await prisma.finance.update({
       where: { user_id: String(verifiedTokenData.payload.userId) },
       data: financePayload,
     });

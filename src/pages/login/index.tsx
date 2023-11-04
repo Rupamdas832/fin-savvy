@@ -9,9 +9,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<{ message: string } | null>(null);
   const router = useRouter();
 
   const handleLoginClick = async () => {
+    setError(null);
     if (email && password) {
       setIsLoading(true);
       try {
@@ -22,8 +24,8 @@ const Login = () => {
         if (status === 200) {
           router.push(`/dashboard`);
         }
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        setError(error.response.data);
       } finally {
         setIsLoading(false);
       }
@@ -57,6 +59,9 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          {error && (
+            <p className="mt-2 text-center text-red-500">{error.message}</p>
+          )}
           <div className="flex flex-col mt-8">
             <Button
               text={isLoading ? "Loging in" : "Log in"}

@@ -119,6 +119,26 @@ export async function POST(req: any) {
     const newInvestment = await prisma.investments.create({
       data: payload,
     });
+
+    const requiredFinanceData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredFinanceData)
+      return NextResponse.json({ error: "User not found" });
+    const financePayload = {
+      ...requiredFinanceData,
+      bank_balance: requiredFinanceData.bank_balance - validatedReq.amount,
+      total_savings: requiredFinanceData.total_savings - validatedReq.amount,
+    };
+    await prisma.finance.update({
+      where: { user_id: String(verifiedTokenData.payload.userId) },
+      data: financePayload,
+    });
+
     return NextResponse.json(newInvestment);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -157,6 +177,14 @@ export async function PUT(req: any) {
 
     const validatedReq = InvestmentSchema.parse(requestBody);
 
+    const prevInvestment = await prisma.investments.findFirst({
+      where: {
+        investment_id: validatedReq.investment_id,
+      },
+    });
+    if (!prevInvestment)
+      return NextResponse.json({ error: "Investment not found" });
+
     const payload = {
       ...validatedReq,
       user_id: String(verifiedTokenData.payload.userId),
@@ -166,6 +194,32 @@ export async function PUT(req: any) {
       where: { investment_id: validatedReq.investment_id },
       data: payload,
     });
+
+    const requiredFinanceData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredFinanceData)
+      return NextResponse.json({ error: "User not found" });
+    const financePayload = {
+      ...requiredFinanceData,
+      bank_balance:
+        requiredFinanceData.bank_balance +
+        prevInvestment.amount -
+        updateInvestment.amount,
+      total_savings:
+        requiredFinanceData.total_savings +
+        prevInvestment.amount -
+        updateInvestment.amount,
+    };
+    await prisma.finance.update({
+      where: { user_id: String(verifiedTokenData.payload.userId) },
+      data: financePayload,
+    });
+
     return NextResponse.json(updateInvestment);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -207,6 +261,27 @@ export async function DELETE(req: any) {
     const deleteInvestment = await prisma.investments.delete({
       where: { investment_id: validatedReq.investment_id },
     });
+
+    const requiredFinanceData = await prisma.finance.findFirst({
+      where: {
+        user_id: {
+          equals: String(verifiedTokenData.payload.userId),
+        },
+      },
+    });
+    if (!requiredFinanceData)
+      return NextResponse.json({ error: "User not found" });
+    const financePayload = {
+      ...requiredFinanceData,
+      bank_balance: requiredFinanceData.bank_balance + deleteInvestment.amount,
+      total_savings:
+        requiredFinanceData.total_savings + deleteInvestment.amount,
+    };
+    await prisma.finance.update({
+      where: { user_id: String(verifiedTokenData.payload.userId) },
+      data: financePayload,
+    });
+
     return NextResponse.json(deleteInvestment);
   } catch (error) {
     if (error instanceof z.ZodError) {

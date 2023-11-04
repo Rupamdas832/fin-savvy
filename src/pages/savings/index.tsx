@@ -212,6 +212,7 @@ const Savings = () => {
       if (status === 200) {
         setInvestmentList((investmentList) => [...investmentList, data]);
         handleResetModal();
+        fetchData();
       }
     } catch (error: any) {
       console.log(error);
@@ -234,6 +235,7 @@ const Savings = () => {
         );
         setInvestmentList(newList);
         handleResetModal();
+        fetchData();
       }
     } catch (error: any) {
       console.log(error);
@@ -256,6 +258,7 @@ const Savings = () => {
         );
         setInvestmentList(newList);
         handleResetModal();
+        fetchData();
       }
     } catch (error: any) {
       console.log(error);

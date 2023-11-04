@@ -69,12 +69,7 @@ const DashboardHeroBanner = ({
           <div className="flex flex-col ml-4">
             <p className="text-sm">Expenses</p>
             <p className="text-base font-bold">
-              ₹{" "}
-              {finance
-                ? (
-                    finance?.total_fixed_expenses + totalCurrentExpenses
-                  ).toLocaleString("en-IN")
-                : 0}
+              ₹ {finance ? totalCurrentExpenses.toLocaleString("en-IN") : 0}
             </p>
           </div>
         </div>
