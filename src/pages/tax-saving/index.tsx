@@ -283,11 +283,7 @@ const TaxSaving = () => {
               <ProgressCard
                 logo={faBuildingColumns}
                 title="80D"
-                currentValue={
-                  (isYourAgeAboveSixty ? 50000 : 25000) +
-                  (isYourParentAgeAboveSixty ? 50000 : 25000) -
-                  required80D
-                }
+                currentValue={required80D}
                 totalValue={
                   (isYourAgeAboveSixty ? 50000 : 25000) +
                   (isYourParentAgeAboveSixty ? 50000 : 25000)

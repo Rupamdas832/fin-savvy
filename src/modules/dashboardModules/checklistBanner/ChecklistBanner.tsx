@@ -104,7 +104,7 @@ const ChecklistBanner = (props: ChecklistBannerProps) => {
         item.status = finance.emi_load > 0 ? "DONE" : "PENDING";
       }
       if (item.id === "6") {
-        item.status = finance.required_80C_investment > 0 ? "DONE" : "PENDING";
+        item.status = finance.monthly_epf > 0 ? "DONE" : "PENDING";
       }
       return item;
     });

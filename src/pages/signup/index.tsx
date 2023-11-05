@@ -25,7 +25,7 @@ const Login = () => {
           ...payload,
         });
         if (status === 200) {
-          router.push(`/onboarding`);
+          router.push(`/dashboard`);
         }
       } catch (error) {
         console.log(error);

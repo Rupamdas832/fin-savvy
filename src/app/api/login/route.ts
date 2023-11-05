@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/app/db/db";
 
-const ExpenseSchema = z.object({
+const CredentialsSchema = z.object({
   email: z.string(),
   password: z.string(),
 });
@@ -15,7 +15,7 @@ export async function POST(req: any) {
   const requestBody = await req.json();
 
   try {
-    const validatedReq = ExpenseSchema.parse(requestBody);
+    const validatedReq = CredentialsSchema.parse(requestBody);
 
     const requestedUser = await prisma.user.findFirst({
       where: {

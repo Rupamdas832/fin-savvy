@@ -86,6 +86,10 @@ const Income = () => {
     fetchIncomeListData();
   }, []);
 
+  useEffect(() => {
+    fetchIncomeListData();
+  }, [selectedMonth]);
+
   const handleIncomeClick = (item: IncomeType) => {
     setIsEdit(true);
     setIsModalOpen(true);

@@ -2,15 +2,24 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../db/db";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
-import { hash } from "@/lib/hash";
+import { compare, hash } from "@/lib/hash";
 import { cookies } from "next/headers";
-import { verify } from "@/lib/jwt";
+import { sign, verify } from "@/lib/jwt";
 
 const UserSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.string(),
   password: z.string().min(8),
+});
+
+const UpdateUserSchema = z.object({
+  user_id: z.string(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  email: z.string(),
+  password: z.string(),
+  new_Password: z.string().optional(),
 });
 
 export async function GET(request: any) {
@@ -75,7 +84,21 @@ export async function POST(req: any) {
         user_id: newUser.user_id,
       },
     });
-    return NextResponse.json({ userData: newUser, userFinance: newFinance });
+
+    const token = await sign({
+      email: newUser.email,
+      userId: newUser.user_id,
+    });
+    const oneDay = 60 * 60 * 1000 * 24;
+
+    cookies().set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      expires: Date.now() + oneDay,
+    });
+
+    return NextResponse.json({ email: newUser.email, userId: newUser.user_id });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.format();
@@ -105,6 +128,60 @@ export async function DELETE(request: any) {
     }
     return NextResponse.json(
       { message: "Please provide user id" },
+      { status: 400 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.format();
+      return NextResponse.json({ errors }, { status: 400 });
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: any) {
+  const requestBody = await req.json();
+
+  try {
+    const validatedReq = await UpdateUserSchema.parse(requestBody);
+
+    let newPasswordHash;
+    if (validatedReq.new_Password) {
+      newPasswordHash = await hash(validatedReq.new_Password);
+    }
+
+    const findUser = await prisma.user.findFirst({
+      where: {
+        user_id: validatedReq.user_id,
+      },
+    });
+    if (!findUser) return NextResponse.json({ message: "User not found" });
+
+    const isValidPassword = await compare(
+      validatedReq.password,
+      findUser.password
+    );
+    if (isValidPassword) {
+      const updatedUser = await prisma.user.update({
+        where: {
+          user_id: validatedReq.user_id,
+        },
+        data: {
+          first_name: validatedReq?.first_name || findUser.first_name,
+          last_name: validatedReq?.last_name || findUser.last_name,
+          email: validatedReq.email,
+          password: newPasswordHash || findUser.password,
+        },
+      });
+      return NextResponse.json({ userData: updatedUser });
+    }
+    return NextResponse.json(
+      { message: "Invalid credentials" },
       { status: 400 }
     );
   } catch (error) {
