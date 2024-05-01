@@ -1,6 +1,12 @@
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/button/Button";
-import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowDown,
+  faBoxOpen,
+  faDumbbell,
+  faHandHoldingDollar,
+  faHeartPulse,
+} from "@fortawesome/free-solid-svg-icons";
 import { faCar } from "@fortawesome/free-solid-svg-icons";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { faBasketShopping } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +15,8 @@ import { faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faReceipt } from "@fortawesome/free-solid-svg-icons";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
+import { faPeopleRoof } from "@fortawesome/free-solid-svg-icons";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoBadge from "@/components/badge/LogoBadge";
 import dayjs from "dayjs";
@@ -70,8 +78,38 @@ const expenseCategory = [
   {
     expense_category_id: "8",
     title: "Home Improvement",
-    logo: faFilm,
+    logo: faHouse,
     color: "bg-orange-300",
+  },
+  {
+    expense_category_id: "9",
+    title: "House Help",
+    logo: faPeopleRoof,
+    color: "bg-fuchsia-300",
+  },
+  {
+    expense_category_id: "10",
+    title: "Self Improvement",
+    logo: faDumbbell,
+    color: "bg-rose-300",
+  },
+  {
+    expense_category_id: "11",
+    title: "Health Care",
+    logo: faHeartPulse,
+    color: "bg-violet-300",
+  },
+  {
+    expense_category_id: "12",
+    title: "Money lend",
+    logo: faHandHoldingDollar,
+    color: "bg-indigo-300",
+  },
+  {
+    expense_category_id: "13",
+    title: "Miscellaneous",
+    logo: faBoxOpen,
+    color: "bg-cyan-300",
   },
 ];
 

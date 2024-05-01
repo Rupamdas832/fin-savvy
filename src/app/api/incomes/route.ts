@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
           user_id: { equals: String(verifiedTokenData.payload.userId) },
           income_date: {
             gte: startDate,
-            lt: endDate,
+            lte: endDate,
           },
         },
       });
