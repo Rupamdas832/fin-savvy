@@ -4,6 +4,7 @@ import { prisma } from "@/app/db/db";
 import { Prisma } from "@prisma/client";
 import { cookies } from "next/headers";
 import { verify } from "@/lib/jwt";
+import { getFirstAndLastDateOfAMonth } from "@/utils/general";
 
 const IncomeSchema = z.object({
   description: z.string(),
@@ -50,8 +51,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (verifiedTokenData.payload?.userId) {
-      const startDate = new Date(year, month - 1, 1);
-      const endDate = new Date(year, month, 0);
+      const { startDate, endDate } = getFirstAndLastDateOfAMonth(month, year);
       const requiredData = await prisma.incomes.findMany({
         where: {
           user_id: { equals: String(verifiedTokenData.payload.userId) },
