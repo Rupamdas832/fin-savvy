@@ -39,5 +39,8 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "prisma": "^5.1.1"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
